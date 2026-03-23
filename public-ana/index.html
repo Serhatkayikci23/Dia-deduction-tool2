@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AR-GE Personel Yönetimi</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        background: #f0f0f0;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 220px;
+        min-width: 220px;
+        background: #1f3864;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      .sidebar-logo {
+        padding: 18px 16px 14px;
+        font-size: 13px;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        line-height: 1.4;
+      }
+      .sidebar-logo span {
+        font-size: 10px;
+        opacity: 0.7;
+        display: block;
+        margin-top: 2px;
+      }
+      .sidebar-menu {
+        flex: 1;
+        padding: 10px 0;
+      }
+      .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.85);
+        border-left: 3px solid transparent;
+        transition: all 0.15s;
+      }
+      .menu-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+      }
+      .menu-item.active {
+        background: rgba(255, 255, 255, 0.12);
+        color: white;
+        border-left-color: #00b050;
+      }
+      .menu-item .icon {
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+      }
+      .sidebar-footer {
+        padding: 12px 16px;
+        font-size: 10px;
+        opacity: 0.5;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* İçerik */
+      .content {
+        flex: 1;
+        overflow: auto;
+        height: 100vh;
+      }
+
+      /* Yükleniyor */
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        color: #888;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        AR-GE Personel
+        <span>Yönetim Sistemi</span>
+      </div>
+      <div class="sidebar-menu">
+        <div
+          class="menu-item active"
+          onclick="loadPage('personel')"
+          id="menu-personel"
+        >
+          <span class="icon">📋</span>
+          Personel Yönetimi
+        </div>
+        <div class="menu-item" onclick="loadPage('proje')" id="menu-proje">
+          <span class="icon">📊</span>
+          Proje Dağılımı
+        </div>
+        <div class="menu-item" onclick="loadPage('bordro')" id="menu-bordro">
+          <span class="icon">💰</span>
+          Aylık Bordro
+        </div>
+      </div>
+      <div class="sidebar-footer">Port 5000</div>
+    </div>
+
+    <div class="content" id="content">
+      <div class="loading">Yükleniyor...</div>
+    </div>
+
+    <script>
+      let currentPage = null;
+
+      async function loadPage(page) {
+        if (currentPage === page) return;
+        currentPage = page;
+
+        document
+          .querySelectorAll(".menu-item")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById(`menu-${page}`).classList.add("active");
+
+        const content = document.getElementById("content");
+        content.innerHTML = '<div class="loading">⏳ Yükleniyor...</div>';
+
+        const res = await fetch(`/${page}.html`);
+        const html = await res.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        // Style'ları head'e ekle
+        doc.querySelectorAll("style").forEach((style) => {
+          const newStyle = document.createElement("style");
+          newStyle.textContent = style.textContent;
+          document.head.appendChild(newStyle);
+        });
+
+        // Body içeriğini al (style'lar hariç)
+        const bodyClone = doc.body.cloneNode(true);
+        bodyClone.querySelectorAll("style").forEach((s) => s.remove());
+        content.innerHTML = bodyClone.innerHTML;
+
+        // Script'leri çalıştır
+        doc.querySelectorAll("script").forEach((script) => {
+          const newScript = document.createElement("script");
+          // let/const → var yap, var tekrar tanımlanabilir ve global kalır
+          const code = script.textContent
+            .replace(/\blet\b/g, "var")
+            .replace(/\bconst\b/g, "var");
+          newScript.textContent = code;
+          document.body.appendChild(newScript);
+          document.body.removeChild(newScript);
+        });
+      }
+      // Sayfa yüklenince personel sayfasını aç
+      loadPage("personel");
+    </script>
+  </body>
+</html>

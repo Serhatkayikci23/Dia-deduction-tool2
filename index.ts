@@ -49,15 +49,15 @@ await db.connect();
 
 await db.query(`DROP TABLE IF EXISTS personel`);
 await db.query(`
-    CREATE TABLE IF NOT EXISTS personel (
-    id SERIAL PRIMARY KEY,
-    tckimlikno TEXT,
-    personeladisoyadi TEXT,
-    persdepartmanaciklama TEXT,
-    argefaaliyetgunsayisi TEXT,
-    aylikbrutkazanc TEXT
-    )
-    `);
+      CREATE TABLE IF NOT EXISTS personel (
+      id SERIAL PRIMARY KEY,
+      tckimlikno TEXT,
+      personeladisoyadi TEXT,
+      persdepartmanaciklama TEXT,
+      argefaaliyetgunsayisi TEXT,
+      aylikbrutkazanc TEXT
+      )
+      `);
 
 try {
   const response = await fetch(baseUrl + "/per/json", {
@@ -212,7 +212,6 @@ app.get("/api/personel/excel", async (req, res) => {
     { header: "ARGE İŞV MALİYETİ", key: "argemaliyet", width: 18 },
   ];
 
-  // ── ADIM 2: Sütun başlık satırını formatla (şu an row 1'de) ──────────────
   const colColors: Record<string, string> = {
     sno: GRAY,
     tckimlikno: GRAY,
@@ -274,7 +273,6 @@ app.get("/api/personel/excel", async (req, res) => {
     };
   });
 
-  // ── ADIM 3: Grup başlık satırını en üste ekle (row 1'i aşağı iter → row 2) ─
   sheet.insertRow(1, []);
   const groupRow = sheet.getRow(1);
   groupRow.height = 30;
@@ -411,6 +409,12 @@ app.get("/api/personel/excel", async (req, res) => {
 
     rowNum++;
   });
+  sheet.addRow({});
+  const totalRow = sheet.addRow({});
+
+  const lastDataRow = rowNum - 1;
+
+  totalRow.getCell("bruttemel").value = { formula: `SUM (H3:H${lastDataRow})` };
 
   res.setHeader(
     "Content-Type",

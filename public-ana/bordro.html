@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Aylık Bordro</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        background: #f0f0f0;
+      }
+
+      .topbar {
+        background: #1f3864;
+        color: white;
+        padding: 10px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .topbar h1 {
+        font-size: 15px;
+      }
+      .topbar-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .btn {
+        padding: 5px 14px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .btn-excel {
+        background: #00b050;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn-save {
+        background: #ff8c00;
+        color: white;
+      }
+      .btn-save:hover {
+        background: #e07700;
+      }
+      .btn-excel:hover {
+        background: #007a38;
+      }
+      #status {
+        color: #90ee90;
+        font-size: 11px;
+        min-width: 160px;
+      }
+
+      .wrap {
+        padding: 10px;
+        overflow-x: auto;
+      }
+      .search-bar {
+        margin-bottom: 12px;
+      }
+      .search-bar input {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        width: 260px;
+        font-size: 12px;
+      }
+
+      table {
+        border-collapse: collapse;
+        white-space: nowrap;
+        background: white;
+      }
+
+      .tr-group th {
+        font-size: 10px;
+        font-weight: bold;
+        padding: 5px 4px;
+        text-align: center;
+        border: 1px solid #aaa;
+      }
+      .th-gray {
+        background: #808080;
+        color: white;
+      }
+      .th-yellow {
+        background: #ffd700;
+        color: #cc0000;
+      }
+      .th-green {
+        background: #00b050;
+        color: white;
+      }
+      .th-brown {
+        background: #843c0c;
+        color: white;
+      }
+      .th-navy {
+        background: #1f3864;
+        color: white;
+      }
+
+      .tr-header th {
+        font-size: 10px;
+        font-weight: bold;
+        padding: 4px 5px;
+        text-align: center;
+        border: 1px solid #aaa;
+        max-width: 90px;
+        white-space: normal;
+        line-height: 1.3;
+        vertical-align: middle;
+      }
+
+      td {
+        padding: 3px 5px;
+        border: 1px solid #ddd;
+        text-align: center;
+        vertical-align: middle;
+      }
+      td.left {
+        text-align: left;
+      }
+      td.fixed {
+        background: #ececec !important;
+        color: #333;
+        font-weight: bold;
+      }
+      tr:nth-child(even) td:not(.fixed) {
+        background: #f9f9f9;
+      }
+      tr:hover td {
+        background: #e8f4ff !important;
+      }
+
+      td input[type="number"] {
+        width: 72px;
+        padding: 2px 4px;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        font-size: 11px;
+        text-align: right;
+        background: #fffde7;
+      }
+      td input[type="number"]:focus {
+        outline: 2px solid #1f3864;
+        background: white;
+      }
+
+      td.calc {
+        background: #f5f5f5;
+        color: #555;
+        font-style: italic;
+        font-size: 11px;
+      }
+      td.calc-yellow {
+        background: #fffde7 !important;
+        color: #cc0000;
+        font-style: italic;
+        font-size: 11px;
+      }
+      td.input-yellow {
+        background: #fffde7;
+      }
+
+      .rate-inp {
+        display: block;
+        width: 58px;
+        margin: 4px auto 0;
+        padding: 2px 3px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 2px;
+        font-size: 10px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-weight: bold;
+      }
+      .rate-inp:focus {
+        outline: 2px solid #ffd700;
+        background: white;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <h1>Aylık Bordro</h1>
+      <div class="topbar-right">
+        <span id="status"></span>
+        <button class="btn btn-save" onclick="saveAll()">Tümünü Kaydet</button>
+        <a class="btn btn-excel" href="/api/bordro/excel">Excel İndir</a>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="search-bar">
+        <input
+          type="text"
+          id="search"
+          placeholder="TC veya isim ara..."
+          oninput="filterRows()"
+        />
+      </div>
+      <table>
+        <thead>
+          <tr class="tr-group">
+            <th class="th-gray" colspan="5"></th>
+            <th class="th-gray" colspan="5">Çalışma &amp; Ücret</th>
+            <th class="th-yellow" colspan="4">
+              SGK Aylık Ve Günlük Üst Sınır İşlemleri
+            </th>
+            <th class="th-gray" colspan="1"></th>
+            <th class="th-green" colspan="6">
+              5510 SAYILI KANUN KAPSAMINDA MATRAH VE %5'LİK İNDİRİM
+            </th>
+            <th class="th-brown" colspan="5">
+              5746 SAYILI KANUN KAPSAMINDA SGK İŞVEREN PAYI HESAPLAMA
+            </th>
+            <th class="th-gray" colspan="11">
+              5746 SAYILI KANUN KAPSAMINDA GELİR VERGİSİ STOPAJ HESAPLAMA
+            </th>
+            <th class="th-navy" colspan="1"></th>
+            <th class="th-gray" colspan="2"></th>
+          </tr>
+          <tr class="tr-header">
+            <th class="th-gray">S/NO</th>
+            <th class="th-gray">TC KİMLİK NO</th>
+            <th class="th-gray">AD SOYAD</th>
+            <th class="th-gray">DEPARTMAN</th>
+            <th class="th-gray">GÖREVİ</th>
+            <th class="th-gray">ARGE MERKEZİNDE ÇALIŞILAN GÜN SAYISI</th>
+            <th class="th-gray">DİĞER FAALİYETLERDE ÇALIŞMA GÜN SAYISI</th>
+            <th class="th-gray">TOPLAM ÇALIŞMA GÜN SAYISI</th>
+            <th class="th-gray">BRÜT TEMEL ÜCRET</th>
+            <th class="th-gray">FAZLA MESAİ - EK ÜCRET</th>
+            <th class="th-yellow">
+              Aylık Üst Sınır<br /><input
+                type="number"
+                id="r_isci"
+                class="rate-inp"
+                step="0.001"
+                value="0.14"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-yellow">Günlük Üst Sınır</th>
+            <th class="th-yellow">AR-GE Aylık Üst Sınır</th>
+            <th class="th-yellow">5510 Aylık Üst Sınır</th>
+            <th class="th-gray">TOPLAM BRÜT ÜCRET</th>
+            <th class="th-green">
+              5510 SGK MATRAHI (DİĞER FAAL, İKRAMİYE PRİM, MESAİ)
+            </th>
+            <th class="th-green">
+              SGK İşçi Payı<br /><input
+                type="number"
+                id="r_sgkisci"
+                class="rate-inp"
+                step="0.001"
+                value="0.14"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-green">
+              SGK İşçi İşsizlik Payı<br /><input
+                type="number"
+                id="r_issizlik"
+                class="rate-inp"
+                step="0.001"
+                value="0.01"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-green">
+              SGK İŞV PAYI<br /><input
+                type="number"
+                id="r_isv"
+                class="rate-inp"
+                step="0.0001"
+                value="0.2175"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-green">
+              SGK İşveren İşsizlik Payı<br /><input
+                type="number"
+                id="r_isvisz"
+                class="rate-inp"
+                step="0.001"
+                value="0.02"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-green">
+              DİĞER FAALİYETLER KAPSAMINDA HESAPLANAN SGK İNDİRİMİ %5
+            </th>
+            <th class="th-brown">ARGE MERKEZİNDEKİ ÜCRET (SİGORTA MATRAHI)</th>
+            <th class="th-brown">
+              SGK İŞV PAYI<br /><input
+                type="number"
+                id="r_isv_arge"
+                class="rate-inp"
+                step="0.0001"
+                value="0.2175"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-brown">
+              SGK İşveren İşsizlik Payı<br /><input
+                type="number"
+                id="r_isvisz_arge"
+                class="rate-inp"
+                step="0.001"
+                value="0.02"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-brown">
+              ARGE MATRAHINDAN 5510 SGK İNDİRİMİ %5<br /><input
+                type="number"
+                id="r_argematrah"
+                class="rate-inp"
+                step="0.001"
+                value="0.05"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-brown">
+              5746 SGK İNDİRİMİ %50<br /><input
+                type="number"
+                id="r_sgk5746"
+                class="rate-inp"
+                step="0.0001"
+                value="0.08375"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-gray">ARGE MERKEZİNDEKİ ÜCRET</th>
+            <th class="th-gray">
+              SGK İşçi Payı<br /><input
+                type="number"
+                id="r_iscipayi1"
+                class="rate-inp"
+                step="0.001"
+                value="0.14"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-gray">
+              SGK İşçi İşsizlik Payı<br /><input
+                type="number"
+                id="r_sgk_issizlik1"
+                class="rate-inp"
+                step="0.001"
+                value="0.01"
+                oninput="recalcAll()"
+              />
+            </th>
+            <th class="th-gray">AR-GE GELİR VERGİSİ MATRAHI</th>
+            <th class="th-gray">GELİR VERGİSİ ORANI</th>
+            <th class="th-gray">GELİR VERGİSİ TUTARI</th>
+            <th class="th-gray">AGİ</th>
+            <th class="th-gray">AGİ MAHSUBU SONRASI GELİR VERGİSİ TUTARI</th>
+            <th class="th-gray">ARGE İSTİSNA ORANI</th>
+            <th class="th-gray">
+              5746 SAYILI KANUN KAPSAMINDA DAMGA TERKİN EDİLECEK DAMGA VERGİSİ
+            </th>
+            <th class="th-gray">ÖDENECEK GV STOPAJ</th>
+            <th class="th-navy">
+              5746 SAYILI KANUN KAPSAMINDA TERKİN EDİLECEK DAMGA VERGİSİ
+            </th>
+            <th class="th-gray">TOPLAM TEŞVİK TUTARI (SGK,GV,DV)</th>
+            <th class="th-gray">ARGE İŞV MALİYETİ</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      let personelData = [];
+
+      const n = (v) => parseFloat(v) || 0;
+      const fmt = (v) =>
+        v === 0
+          ? "0,00"
+          : n(v).toLocaleString("tr-TR", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+
+      function calc(p) {
+        const argegun = n(p.argegun);
+        const digergun = n(p.digergun);
+        const toplamgun = n(p.toplamgun);
+        const bruttemel = n(p.bruttemel);
+        const fazlamesai = n(p.fazlamesai);
+        const aylikust = n(p.aylikust);
+        const argeorani = n(p.argeorani);
+        const agi = n(p.agi);
+        const gvorani = n(p.gvorani);
+
+        const r_isci =
+          parseFloat(document.getElementById("r_sgkisci")?.value) || 0.14;
+        const r_issizlik =
+          parseFloat(document.getElementById("r_issizlik")?.value) || 0.01;
+        const r_isv =
+          parseFloat(document.getElementById("r_isv")?.value) || 0.2175;
+        const r_isvisz =
+          parseFloat(document.getElementById("r_isvisz")?.value) || 0.02;
+
+        const gunlukust = aylikust / 30;
+        const argeaylikust = argegun * gunlukust;
+        const s5510aylik = digergun * gunlukust;
+        const toplambrut = bruttemel + fazlamesai;
+        const sgkmatrah =
+          toplamgun === 0 ? 0 : (bruttemel / toplamgun) * digergun + fazlamesai;
+        const sgkisci = sgkmatrah * r_isci;
+        const sgkissizlik = sgkmatrah * r_issizlik;
+        const sgkisv = sgkmatrah * r_isv;
+        const sgkisvisz = sgkmatrah * r_isvisz;
+        const sgkindirim = sgkmatrah * 0.05;
+        const argesigorta =
+          toplamgun === 0 ? 0 : (argegun / toplamgun) * bruttemel;
+        const sgkisvarge = argesigorta * r_isv;
+        const sgkisvisz2 = argesigorta * r_isvisz;
+        const argesgk5 = argesigorta * 0.05;
+        const sgk5746 = (argesigorta * 0.1675) / 2;
+        const argeucret =
+          toplamgun === 0 ? 0 : (argegun / toplamgun) * bruttemel;
+        const sgkisci2 = argeucret * r_isci;
+        const sgkissizlik2 = argeucret * r_issizlik;
+        const argegvmat = argeucret - sgkisci2 - sgkissizlik2;
+        const gvtutari = argegvmat * gvorani;
+        const agimahsup = gvtutari - agi;
+        const terkingv = agimahsup * argeorani;
+        const odenecekgv = agimahsup - terkingv;
+        const damgaterkin =
+          toplamgun > 0
+            ? Math.max(((bruttemel * 0.00759 - 250.7) / toplamgun) * argegun, 0)
+            : 0;
+        const toplamtesvik = sgk5746 + terkingv + damgaterkin;
+
+        return {
+          gunlukust,
+          argeaylikust,
+          s5510aylik,
+          toplambrut,
+          sgkmatrah,
+          sgkisci,
+          sgkissizlik,
+          sgkisv,
+          sgkisvisz,
+          sgkindirim,
+          argesigorta,
+          sgkisvarge,
+          sgkisvisz2,
+          argesgk5,
+          sgk5746,
+          argeucret,
+          sgkisci2,
+          sgkissizlik2,
+          argegvmat,
+          gvtutari,
+          agimahsup,
+          terkingv,
+          odenecekgv,
+          damgaterkin,
+          toplamtesvik,
+          argemaliyet:
+            bruttemel +
+            sgkisvarge +
+            sgkisvisz2 -
+            argesgk5 -
+            sgk5746 -
+            terkingv -
+            damgaterkin,
+        };
+      }
+
+      function recalcRow(tc) {
+        const row = document.querySelector(`tr[data-tc="${tc}"]`);
+        if (!row) return;
+        const p = personelData.find((x) => x.tckimlikno === tc);
+        if (!p) return;
+        row.querySelectorAll("input[data-field]").forEach((el) => {
+          p[el.dataset.field] = parseFloat(el.value) || 0;
+        });
+        const c = calc(p);
+        Object.keys(c).forEach((key) => {
+          const td = row.querySelector(`td[data-calc="${key}"]`);
+          if (td) td.textContent = fmt(c[key]);
+        });
+        p.damgaterkin = c.damgaterkin;
+      }
+
+      function recalcAll() {
+        personelData.forEach((p) => recalcRow(p.tckimlikno));
+      }
+
+      function renderRows() {
+        const tbody = document.getElementById("tbody");
+        tbody.innerHTML = "";
+        personelData.forEach((p, idx) => {
+          const c = calc(p);
+          const tc = p.tckimlikno;
+          const inp = (field, val) =>
+            `<input type="number" step="any" data-field="${field}" value="${n(val)}"
+          onchange="update('${tc}','${field}',this.value)"
+          oninput="recalcRow('${tc}')" />`;
+
+          const tr = document.createElement("tr");
+          tr.dataset.tc = tc;
+          tr.dataset.search = (tc + " " + p.personeladisoyadi).toLowerCase();
+          tr.innerHTML = `
+        <td class="fixed">${idx + 1}</td>
+        <td class="fixed left">${tc}</td>
+        <td class="fixed left">${p.personeladisoyadi}</td>
+        <td class="fixed left">${p.persdepartmanaciklama || ""}</td>
+        <td class="fixed left">${p.gorevi || ""}</td>
+        <td>${inp("argegun", p.argegun)}</td>
+        <td>${inp("digergun", p.digergun)}</td>
+        <td>${inp("toplamgun", p.toplamgun)}</td>
+        <td>${inp("bruttemel", p.bruttemel)}</td>
+        <td>${inp("fazlamesai", p.fazlamesai)}</td>
+        <td class="input-yellow">${inp("aylikust", p.aylikust)}</td>
+        <td class="calc-yellow" data-calc="gunlukust">${fmt(c.gunlukust)}</td>
+        <td class="calc-yellow" data-calc="argeaylikust">${fmt(c.argeaylikust)}</td>
+        <td class="calc-yellow" data-calc="s5510aylik">${fmt(c.s5510aylik)}</td>
+        <td class="calc" data-calc="toplambrut">${fmt(c.toplambrut)}</td>
+        <td class="calc" data-calc="sgkmatrah">${fmt(c.sgkmatrah)}</td>
+        <td class="calc" data-calc="sgkisci">${fmt(c.sgkisci)}</td>
+        <td class="calc" data-calc="sgkissizlik">${fmt(c.sgkissizlik)}</td>
+        <td class="calc" data-calc="sgkisv">${fmt(c.sgkisv)}</td>
+        <td class="calc" data-calc="sgkisvisz">${fmt(c.sgkisvisz)}</td>
+        <td class="calc" data-calc="sgkindirim">${fmt(c.sgkindirim)}</td>
+        <td class="calc" data-calc="argesigorta">${fmt(c.argesigorta)}</td>
+        <td class="calc" data-calc="sgkisvarge">${fmt(c.sgkisvarge)}</td>
+        <td class="calc" data-calc="sgkisvisz2">${fmt(c.sgkisvisz2)}</td>
+        <td class="calc" data-calc="argesgk5">${fmt(c.argesgk5)}</td>
+        <td class="calc" data-calc="sgk5746">${fmt(c.sgk5746)}</td>
+        <td class="calc" data-calc="argeucret">${fmt(c.argeucret)}</td>
+        <td class="calc" data-calc="sgkisci2">${fmt(c.sgkisci2)}</td>
+        <td class="calc" data-calc="sgkissizlik2">${fmt(c.sgkissizlik2)}</td>
+        <td class="calc" data-calc="argegvmat">${fmt(c.argegvmat)}</td>
+        <td>${inp("gvorani", p.gvorani)}</td>
+        <td class="calc" data-calc="gvtutari">${fmt(c.gvtutari)}</td>
+        <td>${inp("agi", p.agi)}</td>
+        <td class="calc" data-calc="agimahsup">${fmt(c.agimahsup)}</td>
+        <td>${inp("argeorani", p.argeorani)}</td>
+        <td class="calc" data-calc="terkingv">${fmt(c.terkingv)}</td>
+        <td class="calc" data-calc="odenecekgv">${fmt(c.odenecekgv)}</td>
+        <td class="calc" data-calc="damgaterkin">${fmt(c.damgaterkin)}</td>
+        <td class="calc" data-calc="toplamtesvik">${fmt(c.toplamtesvik)}</td>
+        <td class="calc" data-calc="argemaliyet">${fmt(c.argemaliyet)}</td>
+      `;
+
+          p.damgaterkin = c.damgaterkin;
+
+          tbody.appendChild(tr);
+        });
+      }
+
+      function update(tc, field, val) {
+        const p = personelData.find((x) => x.tckimlikno === tc);
+        if (p) p[field] = parseFloat(val) || 0;
+      }
+
+      function filterRows() {
+        const q = document.getElementById("search").value.toLowerCase();
+        document.querySelectorAll("#tbody tr").forEach((tr) => {
+          tr.style.display =
+            tr.dataset.search && tr.dataset.search.includes(q) ? "" : "none";
+        });
+      }
+
+      async function saveAll() {
+        const btn = document.querySelector(".btn-save");
+        btn.textContent = "Kaydediliyor...";
+        btn.disabled = true;
+        let ok = 0,
+          fail = 0;
+
+        for (const p of personelData) {
+          try {
+            await fetch(`/api/bordro/personel/${p.tckimlikno}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                argegun: p.argegun,
+                digergun: p.digergun,
+                toplamgun: p.toplamgun,
+                bruttemel: p.bruttemel,
+                fazlamesai: p.fazlamesai,
+                aylikust: p.aylikust,
+                argeorani: p.argeorani,
+                agi: p.agi,
+                gvorani: p.gvorani,
+                damgaterkin: p.damgaterkin,
+              }),
+            });
+            ok++;
+          } catch {
+            fail++;
+          }
+        }
+
+        btn.textContent = "Tümünü Kaydet";
+        btn.disabled = false;
+        const st = document.getElementById("status");
+        st.textContent =
+          fail === 0
+            ? `✓ ${ok} kayıt kaydedildi`
+            : `⚠ ${ok} başarılı, ${fail} hata`;
+        setTimeout(() => (st.textContent = ""), 3000);
+      }
+
+      (async () => {
+        const res = await fetch("/api/bordro/personel");
+        personelData = await res.json();
+        renderRows();
+      })();
+    </script>
+  </body>
+</html>

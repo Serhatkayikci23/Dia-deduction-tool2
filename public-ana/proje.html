@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Proje Personel Dağılımı</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        background: #f0f0f0;
+      }
+
+      .topbar {
+        background: #1f3864;
+        color: white;
+        padding: 10px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .topbar h1 {
+        font-size: 15px;
+      }
+      .topbar-right {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        padding: 5px 14px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .btn-excel {
+        background: #00b050;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn-excel:hover {
+        background: #007a38;
+      }
+      .btn-proje {
+        background: #ff8c00;
+        color: white;
+      }
+      .btn-proje:hover {
+        background: #e07700;
+      }
+      .btn-kaydet {
+        background: #1f3864;
+        color: white;
+        border: 1px solid #fff;
+      }
+      .btn-sil {
+        background: #c00;
+        color: white;
+        padding: 3px 8px;
+        font-size: 11px;
+      }
+      #status {
+        color: #90ee90;
+        font-size: 11px;
+      }
+
+      .modal-bg {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-bg.open {
+        display: flex;
+      }
+      .modal {
+        background: white;
+        border-radius: 6px;
+        padding: 24px;
+        min-width: 360px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      }
+      .modal h2 {
+        margin-bottom: 16px;
+        font-size: 14px;
+        color: #1f3864;
+      }
+      .modal label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: bold;
+        font-size: 11px;
+      }
+      .modal input,
+      .modal select {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+      .modal-btns {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 4px;
+      }
+      .btn-cancel {
+        background: #aaa;
+        color: white;
+      }
+
+      .proje-list {
+        padding: 10px 18px;
+        background: white;
+        border-bottom: 2px solid #ddd;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .proje-chip {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: default;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .proje-chip .del {
+        cursor: pointer;
+        opacity: 0.7;
+      }
+      .proje-chip .del:hover {
+        opacity: 1;
+      }
+
+      .wrap {
+        padding: 10px;
+        overflow-x: auto;
+      }
+      .search-bar {
+        margin-bottom: 8px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .search-bar input {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        width: 240px;
+        font-size: 12px;
+      }
+
+      table {
+        border-collapse: collapse;
+        white-space: nowrap;
+        background: white;
+      }
+
+      thead th {
+        font-size: 10px;
+        font-weight: bold;
+        padding: 5px 6px;
+        text-align: center;
+        border: 1px solid #aaa;
+        background: #1f3864;
+        color: white;
+        max-width: 100px;
+        white-space: normal;
+        line-height: 1.3;
+        vertical-align: middle;
+      }
+      thead th.th-fixed {
+        background: #808080;
+      }
+
+      td {
+        padding: 3px 5px;
+        border: 1px solid #ddd;
+        text-align: center;
+        vertical-align: middle;
+      }
+      td.left {
+        text-align: left;
+      }
+      td.fixed {
+        background: #ececec !important;
+        color: #333;
+      }
+      tr:nth-child(even) td:not(.fixed) {
+        background: #fffde7;
+      }
+      tr:hover td {
+        background: #e8f4ff !important;
+      }
+
+      td input[type="number"] {
+        width: 65px;
+        padding: 2px 4px;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        font-size: 11px;
+        text-align: right;
+        background: white;
+      }
+      td input[type="number"]:focus {
+        outline: 2px solid #1f3864;
+      }
+
+      td.toplam {
+        font-weight: bold;
+        background: #e8ffe8 !important;
+      }
+
+      .empty {
+        color: #aaa;
+        font-style: italic;
+        padding: 20px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <h1>Proje Personel Dağılımı</h1>
+      <div class="topbar-right">
+        <span id="status"></span>
+        <button class="btn btn-proje" onclick="openProjeModal()">
+          + Proje Ekle
+        </button>
+        <button class="btn btn-kaydet" onclick="saveAll()">Kaydet</button>
+        <a class="btn btn-excel" href="/api/proje/excel">Excel İndir</a>
+      </div>
+    </div>
+
+    <div class="proje-list" id="projeList">
+      <span style="color: #888; font-size: 11px">Proje yükleniyor...</span>
+    </div>
+
+    <div class="wrap">
+      <div class="search-bar">
+        <input
+          type="text"
+          id="search"
+          placeholder="TC veya isim ara..."
+          oninput="filterRows()"
+        />
+        <span id="rowCount" style="color: #666; font-size: 11px"></span>
+      </div>
+      <table id="tbl">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="modal-bg" id="projeModal">
+      <div class="modal">
+        <h2 id="modalTitle">Proje Ekle</h2>
+        <label>Proje Adı</label>
+        <input type="text" id="f_adi" placeholder="Proje adı" />
+        <label>Proje Kodu</label>
+        <input type="text" id="f_kodu" placeholder="OMS.25.01" />
+        <label>Başlangıç Tarihi</label>
+        <input type="text" id="f_bas" placeholder="01.09.2025" />
+        <label>Bitiş Tarihi</label>
+        <input type="text" id="f_bit" placeholder="31.05.2026" />
+        <label>Proje Süresi (Ay)</label>
+        <input type="number" id="f_suresi" step="1" placeholder="12" />
+        <label>Renk</label>
+        <select id="f_renk">
+          <option value="MAVI">Mavi</option>
+          <option value="MOR">Mor</option>
+          <option value="TURUNCU">Turuncu</option>
+          <option value="SARI">Sarı</option>
+          <option value="YESIL">Yeşil</option>
+        </select>
+        <div class="modal-btns">
+          <button class="btn btn-cancel" onclick="closeModal()">İptal</button>
+          <button class="btn btn-proje" onclick="saveProje()">Kaydet</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const COLORS = {
+        MAVI: "#00B0F0",
+        MOR: "#7030A0",
+        TURUNCU: "#FF6600",
+        SARI: "#FFD700",
+        YESIL: "#92D050",
+        KIRMIZI: "#FF0000",
+      };
+
+      let personelData = [];
+      let projeler = [];
+      let oranMap = {};
+      let editProjeId = null;
+
+      const n = (v) => parseFloat(v) || 0;
+      const fmt = (v) =>
+        v === 0
+          ? ""
+          : n(v).toLocaleString("tr-TR", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+
+      async function loadAll() {
+        const [pRes, prRes, orRes] = await Promise.all([
+          fetch("/api/personel").then((r) => r.json()),
+          fetch("/api/proje/projeler").then((r) => r.json()),
+          fetch("/api/proje/oranlar").then((r) => r.json()),
+        ]);
+        personelData = pRes;
+        projeler = prRes;
+        oranMap = {};
+        for (const o of orRes) {
+          if (!oranMap[o.tckimlikno]) oranMap[o.tckimlikno] = {};
+          oranMap[o.tckimlikno][o.proje_kodu] = parseFloat(o.oran);
+        }
+        renderProjeList();
+        renderTable();
+        document.getElementById("rowCount").textContent =
+          `${personelData.length} personel`;
+      }
+
+      function renderProjeList() {
+        const div = document.getElementById("projeList");
+        if (projeler.length === 0) {
+          div.innerHTML =
+            '<span style="color:#aaa;font-size:11px;">Henüz proje eklenmedi</span>';
+          return;
+        }
+        div.innerHTML = projeler
+          .map(
+            (p) => `
+          <div class="proje-chip" style="background:${COLORS[p.renk] || "#ccc"};color:${p.renk === "SARI" ? "#333" : "white"}">
+            <span onclick="editProje(${p.id})" style="cursor:pointer" title="Düzenle">${p.proje_kodu} — ${p.proje_adi}</span>
+            <span class="del" onclick="deleteProje(${p.id})" title="Sil">✕</span>
+          </div>
+        `,
+          )
+          .join("");
+      }
+
+      function renderTable() {
+        const thead = document.getElementById("thead");
+        const tbody = document.getElementById("tbody");
+
+        thead.innerHTML = `
+          <tr>
+            <th class="th-fixed">#</th>
+            <th class="th-fixed">TC KİMLİK NO</th>
+            <th class="th-fixed">AD SOYAD</th>
+            <th class="th-fixed">DEPARTMAN</th>
+            <th class="th-fixed">GÖREVİ</th>
+            ${projeler
+              .map(
+                (p) => `
+              <th style="background:${COLORS[p.renk] || "#ccc"};color:${p.renk === "SARI" ? "#333" : "white"}">
+                ${p.proje_adi}<br>
+                <small>${p.proje_kodu}</small>
+              </th>
+            `,
+              )
+              .join("")}
+            <th class="th-fixed">TOPLAM</th>
+          </tr>
+        `;
+
+        tbody.innerHTML = "";
+        personelData.forEach((p, idx) => {
+          const oranlar = oranMap[p.tckimlikno] || {};
+          let toplam = 0;
+          projeler.forEach((pr) => {
+            toplam += n(oranlar[pr.proje_kodu]);
+          });
+
+          const tr = document.createElement("tr");
+          tr.dataset.search = (
+            p.tckimlikno +
+            " " +
+            p.personeladisoyadi
+          ).toLowerCase();
+          tr.innerHTML = `
+            <td class="fixed">${idx + 1}</td>
+            <td class="fixed left">${p.tckimlikno}</td>
+            <td class="fixed left">${p.personeladisoyadi}</td>
+            <td class="fixed left">${p.persdepartmanaciklama || ""}</td>
+            <td class="fixed left">${p.gorevi || ""}</td>
+            ${projeler
+              .map(
+                (pr) => `
+              <td>
+                <input type="number" step="0.01" min="0" max="1"
+                  value="${oranlar[pr.proje_kodu] !== undefined ? oranlar[pr.proje_kodu] : ""}"
+                  data-tc="${p.tckimlikno}"
+                  data-proje="${pr.proje_kodu}"
+                  oninput="updateOran(this)"
+                />
+              </td>
+            `,
+              )
+              .join("")}
+            <td class="toplam" data-tc="${p.tckimlikno}">${toplam > 0 ? fmt(toplam) : ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function updateOran(input) {
+        const tc = input.dataset.tc;
+        const proje = input.dataset.proje;
+        const val = parseFloat(input.value);
+        if (!oranMap[tc]) oranMap[tc] = {};
+        if (isNaN(val)) delete oranMap[tc][proje];
+        else oranMap[tc][proje] = val;
+
+        // Toplam güncelle
+        const totalCell = document.querySelector(`td.toplam[data-tc="${tc}"]`);
+        let sum = 0;
+        projeler.forEach((pr) => {
+          sum += n(oranMap[tc][pr.proje_kodu]);
+        });
+        totalCell.textContent = sum > 0 ? fmt(sum) : "";
+        totalCell.style.color = sum > 1.001 ? "red" : "";
+      }
+
+      function filterRows() {
+        const q = document.getElementById("search").value.toLowerCase();
+        document.querySelectorAll("#tbody tr").forEach((tr) => {
+          tr.style.display = tr.dataset.search.includes(q) ? "" : "none";
+        });
+      }
+
+      async function saveAll() {
+        const btn = document.querySelector(".btn-kaydet");
+        btn.textContent = "Kaydediliyor...";
+        btn.disabled = true;
+        let ok = 0,
+          fail = 0;
+
+        for (const [tc, oranlar] of Object.entries(oranMap)) {
+          for (const [proje_kodu, oran] of Object.entries(oranlar)) {
+            try {
+              await fetch("/api/proje/oranlar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tckimlikno: tc, proje_kodu, oran }),
+              });
+              ok++;
+            } catch {
+              fail++;
+            }
+          }
+        }
+
+        btn.textContent = "Kaydet";
+        btn.disabled = false;
+        setStatus(
+          fail === 0
+            ? `✓ ${ok} oran kaydedildi`
+            : `⚠ ${ok} başarılı, ${fail} hata`,
+        );
+      }
+
+      function openProjeModal() {
+        editProjeId = null;
+        document.getElementById("modalTitle").textContent = "Proje Ekle";
+        document.getElementById("f_adi").value = "";
+        document.getElementById("f_kodu").value = "";
+        document.getElementById("f_bas").value = "";
+        document.getElementById("f_bit").value = "";
+        document.getElementById("f_suresi").value = "";
+        document.getElementById("f_renk").value = "MAVI";
+        document.getElementById("projeModal").classList.add("open");
+      }
+
+      function editProje(id) {
+        const p = projeler.find((x) => x.id === id);
+        if (!p) return;
+        editProjeId = id;
+        document.getElementById("modalTitle").textContent = "Proje Düzenle";
+        document.getElementById("f_adi").value = p.proje_adi;
+        document.getElementById("f_kodu").value = p.proje_kodu;
+        document.getElementById("f_bas").value = p.baslangic_tarihi;
+        document.getElementById("f_bit").value = p.bitis_tarihi;
+        document.getElementById("f_suresi").value = p.proje_suresi || 0;
+        document.getElementById("f_renk").value = p.renk;
+        document.getElementById("projeModal").classList.add("open");
+      }
+
+      function closeModal() {
+        document.getElementById("projeModal").classList.remove("open");
+      }
+
+      async function saveProje() {
+        const body = {
+          proje_adi: document.getElementById("f_adi").value,
+          proje_kodu: document.getElementById("f_kodu").value,
+          baslangic_tarihi: document.getElementById("f_bas").value,
+          bitis_tarihi: document.getElementById("f_bit").value,
+          proje_suresi:
+            parseFloat(document.getElementById("f_suresi").value) || 0,
+          renk: document.getElementById("f_renk").value,
+        };
+
+        if (!body.proje_adi || !body.proje_kodu) {
+          alert("Proje adı ve kodu zorunludur");
+          return;
+        }
+
+        const url = editProjeId
+          ? `/api/proje/projeler/${editProjeId}`
+          : "/api/proje/projeler";
+        const method = editProjeId ? "PUT" : "POST";
+
+        await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        closeModal();
+        await loadAll();
+        setStatus(editProjeId ? "✓ Proje güncellendi" : "✓ Proje eklendi");
+      }
+
+      async function deleteProje(id) {
+        const p = projeler.find((x) => x.id === id);
+        if (
+          !confirm(
+            `"${p?.proje_adi}" projesini silmek istediğinize emin misiniz?`,
+          )
+        )
+          return;
+        await fetch(`/api/proje/projeler/${id}`, { method: "DELETE" });
+        await loadAll();
+        setStatus("✓ Proje silindi");
+      }
+
+      function setStatus(msg) {
+        const el = document.getElementById("status");
+        el.textContent = msg;
+        setTimeout(() => (el.textContent = ""), 3000);
+      }
+
+      loadAll();
+    </script>
+  </body>
+</html>

@@ -164,11 +164,12 @@ projeRouter.get("/excel", async (req, res) => {
     TURUNCU: "FFFF6600",
     MAVI: "FF00B0F0",
     SARI: "FFFFFF00",
-    YESIL: "FF92D050",
+    YESIL: "FF28B43C",
     KIRMIZI: "FFFF0000",
     GRAY: "FFD9D9D9",
     WHITE: "FFFFFFFF",
     LIGHTYELLOW: "FFFFFFCC",
+    PURPLE: "7030a0",
   };
   const getColor = (renk: string) => COLORS[renk?.toUpperCase()] ?? "FFD9D9D9";
   const thin = { style: "thin" as const };
@@ -235,7 +236,11 @@ projeRouter.get("/excel", async (req, res) => {
     (h, i) => {
       const cell = sheet.getRow(4).getCell(i + 1);
       cell.value = h;
-      styleCell(cell, { bold: true, bgColor: COLORS.GRAY });
+      styleCell(cell, {
+        bold: true,
+        bgColor: COLORS.PURPLE,
+        fontColor: "FFFFFFFF",
+      });
     },
   );
   projeler.forEach((p, i) => {
@@ -246,7 +251,8 @@ projeRouter.get("/excel", async (req, res) => {
   sheet.getRow(4).getCell(totalCol).value = "TOPLAM";
   styleCell(sheet.getRow(4).getCell(totalCol), {
     bold: true,
-    bgColor: COLORS.GRAY,
+    bgColor: COLORS.PURPLE,
+    fontColor: "FFFFFFFF",
   });
 
   personelList.forEach((p, idx) => {

@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="tr">
   <head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
     <meta charset="UTF-8" />
     <title>AR-GE Personel Yönetimi</title>
     <style>
@@ -18,12 +22,11 @@
         overflow: hidden;
       }
 
-      /* Sidebar */
       .sidebar {
         width: 220px;
         min-width: 220px;
-        background: #1f3864;
-        color: white;
+        background: #1a1a1a;
+        color: #28b43c;
         display: flex;
         flex-direction: column;
         height: 100vh;
@@ -51,8 +54,8 @@
         gap: 10px;
         padding: 10px 16px;
         cursor: pointer;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.85);
+        font-size: 16px;
+        color: #28b43c;
         border-left: 3px solid transparent;
         transition: all 0.15s;
       }
@@ -60,10 +63,10 @@
         background: rgba(255, 255, 255, 0.08);
         color: white;
       }
-      .menu-item.active {
+      .-item.active {
         background: rgba(255, 255, 255, 0.12);
         color: white;
-        border-left-color: #00b050;
+        border-left-color: #27cc06be;
       }
       .menu-item .icon {
         font-size: 16px;
@@ -77,14 +80,12 @@
         border-top: 1px solid rgba(255, 255, 255, 0.1);
       }
 
-      /* İçerik */
       .content {
         flex: 1;
         overflow: auto;
         height: 100vh;
       }
 
-      /* Yükleniyor */
       .loading {
         display: flex;
         align-items: center;
@@ -98,7 +99,11 @@
   <body>
     <div class="sidebar">
       <div class="sidebar-logo">
-        AR-GE Personel
+        <img
+          src="/image/panu1.gif"
+          style="width: 100px; height: auto; margin-bottom: 6px"
+        />
+        <div>AR-GE Personel</div>
         <span>Yönetim Sistemi</span>
       </div>
       <div class="sidebar-menu">
@@ -107,21 +112,130 @@
           onclick="loadPage('personel')"
           id="menu-personel"
         >
-          <span class="icon">📋</span>
-          Personel Yönetimi
+          <i class="fa-solid fa-clipboard-list"></i>
+          Proje Yönetimi
         </div>
         <div class="menu-item" onclick="loadPage('proje')" id="menu-proje">
-          <span class="icon">📊</span>
+          <i class="fa-solid fa-chart-bar"></i>
           Proje Dağılımı
         </div>
         <div class="menu-item" onclick="loadPage('bordro')" id="menu-bordro">
-          <span class="icon">💰</span>
+          <i class="fa-solid fa-wallet"></i>
           Aylık Bordro
         </div>
       </div>
-      <div class="sidebar-footer">Port 5000</div>
-    </div>
+      <div
+        style="
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        "
+      >
+        <a
+          href="https://www.facebook.com/panuteknolojii?locale=tr_TR"
+          target="_blank"
+          style="color: #28b43c; text-decoration: none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1877F2"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+            ></path>
+          </svg>
+        </a>
+        <a
+          href="https://instagram.com/panuteknoloji/"
+          target="_blank"
+          style="color: #28b43c; text-decoration: none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#E1306C"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
 
+        <a
+          href="https://www.linkedin.com/company/panu-teknoloji-ltd-sti/posts/?feedView=all"
+          target="_blank"
+          style="color: #28b43c; text-decoration: none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="36"
+            viewBox="0 0 640 640"
+            fill="#0A66C2"
+          >
+            <path
+              d="M196.3 512L103.4 512L103.4 212.9L196.3 212.9L196.3 512zM149.8 172.1C120.1 172.1 96 147.5 96 117.8C96 103.5 101.7 89.9 111.8 79.8C121.9 69.7 135.6 64 149.8 64C164 64 177.7 69.7 187.8 79.8C197.9 89.9 203.6 103.6 203.6 117.8C203.6 147.5 179.5 172.1 149.8 172.1zM543.9 512L451.2 512L451.2 366.4C451.2 331.7 450.5 287.2 402.9 287.2C354.6 287.2 347.2 324.9 347.2 363.9L347.2 512L254.4 512L254.4 212.9L343.5 212.9L343.5 253.7L344.8 253.7C357.2 230.2 387.5 205.4 432.7 205.4C526.7 205.4 544 267.3 544 347.7L544 512L543.9 512z"
+            />
+          </svg>
+        </a>
+
+        <a
+          href="https://x.com/panuteknoloji"
+          target="_blank"
+          style="color: #28b43c; text-decoration: none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="36"
+            viewBox="0 0 640 640"
+            fill="#FFFFFF"
+          >
+            <path
+              d="M453.2 112L523.8 112L369.6 288.2L551 528L409 528L297.7 382.6L170.5 528L99.8 528L264.7 339.5L90.8 112L236.4 112L336.9 244.9L453.2 112zM428.4 485.8L467.5 485.8L215.1 152L173.1 152L428.4 485.8z"
+            />
+          </svg>
+        </a>
+
+        <a
+          href="https://www.youtube.com/channel/UCy1M15JA5g_zMuBh_-fu5mw"
+          target="_blank"
+          style="color: #28b43c; text-decoration: none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="36"
+            viewBox="0 0 640 640"
+            fill="#FF0000"
+          >
+            <path
+              d="M581.7 188.1C575.5 164.4 556.9 145.8 533.4 139.5C490.9 128 320.1 128 320.1 128C320.1 128 149.3 128 106.7 139.5C83.2 145.8 64.7 164.4 58.4 188.1C47 231 47 320.4 47 320.4C47 320.4 47 409.8 58.4 452.7C64.7 476.3 83.2 494.2 106.7 500.5C149.3 512 320.1 512 320.1 512C320.1 512 490.9 512 533.5 500.5C557 494.2 575.5 476.3 581.8 452.7C593.2 409.8 593.2 320.4 593.2 320.4C593.2 320.4 593.2 231 581.8 188.1zM264.2 401.6L264.2 239.2L406.9 320.4L264.2 401.6z"
+            />
+          </svg>
+        </a>
+
+        <span style="font-size: 10px; opacity: 0.5; color: white"
+          >Port 5000</span
+        >
+      </div>
+    </div>
     <div class="content" id="content">
       <div class="loading">Yükleniyor...</div>
     </div>
@@ -147,22 +261,18 @@
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
 
-        // Style'ları head'e ekle
         doc.querySelectorAll("style").forEach((style) => {
           const newStyle = document.createElement("style");
           newStyle.textContent = style.textContent;
           document.head.appendChild(newStyle);
         });
 
-        // Body içeriğini al (style'lar hariç)
         const bodyClone = doc.body.cloneNode(true);
         bodyClone.querySelectorAll("style").forEach((s) => s.remove());
         content.innerHTML = bodyClone.innerHTML;
 
-        // Script'leri çalıştır
         doc.querySelectorAll("script").forEach((script) => {
           const newScript = document.createElement("script");
-          // let/const → var yap, var tekrar tanımlanabilir ve global kalır
           const code = script.textContent
             .replace(/\blet\b/g, "var")
             .replace(/\bconst\b/g, "var");
@@ -171,7 +281,6 @@
           document.body.removeChild(newScript);
         });
       }
-      // Sayfa yüklenince personel sayfasını aç
       loadPage("personel");
     </script>
   </body>

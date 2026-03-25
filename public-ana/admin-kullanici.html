@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin — Kullanıcı Yönetimi</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --green: #28b43c;
+        --green-soft: rgba(40, 180, 60, 0.1);
+        --green-border: rgba(40, 180, 60, 0.3);
+        --red: #e53e3e;
+        --red-soft: rgba(229, 62, 62, 0.08);
+        --red-border: rgba(229, 62, 62, 0.25);
+        --bg: #f0f0f0;
+        --card: #ffffff;
+        --card-border: rgba(0, 0, 0, 0.1);
+        --input-bg: #f9f9f9;
+        --input-border: rgba(0, 0, 0, 0.15);
+        --text: #1a1a1a;
+        --muted: #888;
+        --row-hover: rgba(40, 180, 60, 0.04);
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        background: var(--bg);
+        min-height: 100vh;
+        color: var(--text);
+        padding: 32px 24px;
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .header-icon {
+        width: 34px;
+        height: 34px;
+        background: var(--green-soft);
+        border: 1px solid var(--green-border);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--green);
+      }
+      .header-title {
+        font-size: 15px;
+        font-weight: bold;
+        color: #1a1a1a;
+      }
+      .header-sub {
+        font-size: 10px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      .btn-back {
+        font-size: 11px;
+        color: var(--muted);
+        background: none;
+        border: 1px solid var(--card-border);
+        padding: 7px 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+      }
+      .btn-back:hover {
+        color: var(--green);
+        border-color: var(--green-border);
+      }
+
+      .add-card {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .add-card h3 {
+        font-size: 12px;
+        font-weight: bold;
+        color: var(--green);
+        margin-bottom: 14px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .field label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .field input {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 5px;
+        padding: 8px 10px;
+        color: var(--text);
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .field input:focus {
+        border-color: var(--green);
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .btn-green {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--green);
+        border: none;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+      .btn-green:hover {
+        opacity: 0.88;
+      }
+      .btn-green:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .table-card {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .table-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--card-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .table-title {
+        font-size: 12px;
+        font-weight: bold;
+        color: #1a1a1a;
+      }
+      .user-count {
+        font-size: 11px;
+        color: var(--green);
+        background: var(--green-soft);
+        border: 1px solid var(--green-border);
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        padding: 10px 18px;
+        text-align: left;
+        font-size: 11px;
+        color: var(--muted);
+        border-bottom: 1px solid var(--card-border);
+        font-weight: bold;
+        background: #fafafa;
+      }
+      td {
+        padding: 11px 18px;
+        font-size: 12px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        color: var(--text);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: var(--row-hover);
+      }
+      .td-muted {
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 6px;
+      }
+
+      .btn-sifre {
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--green-border);
+        background: none;
+        color: var(--green);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-sifre:hover {
+        background: var(--green-soft);
+      }
+
+      .btn-sil {
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--red-border);
+        background: none;
+        color: var(--red);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-sil:hover {
+        background: var(--red-soft);
+      }
+
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.show {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 24px;
+        width: 340px;
+      }
+      .modal h3 {
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 16px;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 16px;
+      }
+
+      .btn-iptal {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        padding: 7px 14px;
+        border: 1px solid var(--card-border);
+        background: none;
+        color: var(--muted);
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-iptal:hover {
+        color: var(--text);
+      }
+
+      .msg {
+        font-size: 11px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        margin-top: 10px;
+        display: none;
+      }
+      .msg.error {
+        background: var(--red-soft);
+        border: 1px solid var(--red-border);
+        color: var(--red);
+        display: block;
+      }
+      .msg.success {
+        background: var(--green-soft);
+        border: 1px solid var(--green-border);
+        color: var(--green);
+        display: block;
+      }
+
+      .empty {
+        padding: 40px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header-left">
+          <div class="header-icon">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <div>
+            <div class="header-title">Kullanıcı Yönetimi</div>
+            <div class="header-sub">Admin Panel</div>
+          </div>
+        </div>
+        <a href="/index.html" class="btn-back">← Geri</a>
+      </div>
+
+      <div class="add-card">
+        <h3>Yeni Kullanıcı Ekle</h3>
+        <div class="form-grid">
+          <div class="field">
+            <label>Ad Soyad</label>
+            <input type="text" id="yeni-ad" placeholder="Ad Soyad" />
+          </div>
+          <div class="field">
+            <label>E-posta</label>
+            <input type="email" id="yeni-email" placeholder="E-posta" />
+          </div>
+          <div class="field">
+            <label>Şifre</label>
+            <input type="password" id="yeni-sifre" placeholder="Şifre" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-green" onclick="kullaniciEkle()">+ Ekle</button>
+        </div>
+        <div class="msg" id="ekle-msg"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Kullanıcılar</div>
+          <div class="user-count" id="user-count">— kayıt</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Ad Soyad</th>
+              <th>E-posta</th>
+              <th>Kayıt Tarihi</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tablo-body">
+            <tr>
+              <td colspan="5"><div class="empty">Yükleniyor...</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="sifre-modal">
+      <div class="modal">
+        <h3>Şifre Değiştir</h3>
+        <div class="field">
+          <label>Yeni Şifre</label>
+          <input
+            type="password"
+            id="yeni-sifre-modal"
+            placeholder="Yeni şifre"
+          />
+        </div>
+        <div class="msg" id="sifre-msg"></div>
+        <div class="modal-actions">
+          <button class="btn-iptal" onclick="modalKapat()">İptal</button>
+          <button class="btn-green" onclick="sifreDegistir()">Kaydet</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var token =
+        localStorage.getItem("arge_token") ||
+        sessionStorage.getItem("arge_token");
+      if (!token) window.location.href = "/login.html";
+
+      var aktifId = null;
+
+      async function kullanicilariGetir() {
+        var res = await fetch("/api/auth/kullanicilar", {
+          headers: { Authorization: "Bearer " + token },
+        });
+        var data = await res.json();
+
+        document.getElementById("user-count").textContent =
+          data.length + " kayıt";
+
+        if (!data.length) {
+          document.getElementById("tablo-body").innerHTML =
+            '<tr><td colspan="5"><div class="empty">Henüz kullanıcı yok.</div></td></tr>';
+          return;
+        }
+
+        document.getElementById("tablo-body").innerHTML = data
+          .map(function (u) {
+            return (
+              "<tr>" +
+              '<td class="td-muted">' +
+              u.id +
+              "</td>" +
+              "<td>" +
+              u.ad +
+              "</td>" +
+              "<td>" +
+              u.email +
+              "</td>" +
+              '<td class="td-muted">' +
+              new Date(u.olusturma).toLocaleDateString("tr-TR") +
+              "</td>" +
+              '<td><div class="actions">' +
+              '<button class="btn-sifre" onclick="modalAc(' +
+              u.id +
+              ')">Şifre Değiştir</button>' +
+              '<button class="btn-sil" onclick="kullaniciSil(' +
+              u.id +
+              ", '" +
+              u.ad +
+              "')\">Sil</button>" +
+              "</div></td>" +
+              "</tr>"
+            );
+          })
+          .join("");
+      }
+
+      async function kullaniciEkle() {
+        var ad = document.getElementById("yeni-ad").value.trim();
+        var email = document.getElementById("yeni-email").value.trim();
+        var sifre = document.getElementById("yeni-sifre").value;
+        var msg = document.getElementById("ekle-msg");
+
+        msg.className = "msg";
+        if (!ad || !email || !sifre) {
+          msg.textContent = "Tüm alanlar zorunludur.";
+          msg.className = "msg error";
+          return;
+        }
+
+        var res = await fetch("/api/auth/kullanicilar/ekle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({ ad: ad, email: email, password: sifre }),
+        });
+        var data = await res.json();
+
+        if (!res.ok) {
+          msg.textContent = data.error || "Hata oluştu.";
+          msg.className = "msg error";
+          return;
+        }
+
+        msg.textContent = "Kullanıcı eklendi.";
+        msg.className = "msg success";
+        document.getElementById("yeni-ad").value = "";
+        document.getElementById("yeni-email").value = "";
+        document.getElementById("yeni-sifre").value = "";
+        kullanicilariGetir();
+        setTimeout(function () {
+          msg.className = "msg";
+        }, 3000);
+      }
+
+      async function kullaniciSil(id, ad) {
+        if (
+          !confirm(
+            '"' + ad + '" adlı kullanıcıyı silmek istediğinize emin misiniz?',
+          )
+        )
+          return;
+        await fetch("/api/auth/kullanicilar/sil", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({ id: id }),
+        });
+        kullanicilariGetir();
+      }
+
+      function modalAc(id) {
+        aktifId = id;
+        document.getElementById("yeni-sifre-modal").value = "";
+        document.getElementById("sifre-msg").className = "msg";
+        document.getElementById("sifre-modal").classList.add("show");
+      }
+
+      function modalKapat() {
+        document.getElementById("sifre-modal").classList.remove("show");
+        aktifId = null;
+      }
+
+      async function sifreDegistir() {
+        var sifre = document.getElementById("yeni-sifre-modal").value;
+        var msg = document.getElementById("sifre-msg");
+
+        if (!sifre) {
+          msg.textContent = "Şifre boş olamaz.";
+          msg.className = "msg error";
+          return;
+        }
+
+        var res = await fetch("/api/auth/kullanicilar/sifre", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({ id: aktifId, password: sifre }),
+        });
+
+        if (!res.ok) {
+          msg.textContent = "Hata oluştu.";
+          msg.className = "msg error";
+          return;
+        }
+
+        msg.textContent = "Şifre güncellendi.";
+        msg.className = "msg success";
+        setTimeout(modalKapat, 1200);
+      }
+
+      document
+        .getElementById("sifre-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) modalKapat();
+        });
+
+      kullanicilariGetir();
+    </script>
+  </body>
+</html>

@@ -57,7 +57,8 @@ personelRouter.get("/", async (req, res) => {
             COALESCE(b.digergun, 0) as digergun,
             COALESCE(b.toplamgun, 0) as toplamgun,
             COALESCE(b.bruttemel, 0) as bruttemel,
-            COALESCE(b.fazlamesai, 0) as fazlamesai
+     COALESCE(b.fazlamesai, 0) as fazlamesai,
+          COALESCE(b.damgaterkin, 0) as damgaterkin
      FROM personel p
      LEFT JOIN bordro_detay b ON p.tckimlikno = b.tckimlikno
      ORDER BY p.personeladisoyadi`,
@@ -81,7 +82,7 @@ personelRouter.get("/detay/:proje_kodu", async (req, res) => {
 personelRouter.put("/detay/:proje_kodu/:tckimlikno", async (req, res) => {
   const { proje_kodu, tckimlikno } = req.params;
   const { aylikust, argeorani, agi, gvorani } = req.body;
-  // argegun, digergun, toplamgun, bruttemel, fazlamesai bordro'dan gelir, burda update edilemez
+
   await db.query(
     `INSERT INTO personel_proje_detay
        (tckimlikno, proje_kodu, aylikust, argeorani, agi, gvorani)
@@ -126,22 +127,23 @@ personelRouter.get("/excel", async (req, res) => {
   const BROWN = "FF843C0C";
   const NAVY = "FF1F3864";
   const GRAY = "FF808080";
+  const PURPLE = "7030a0";
 
   const colColors: Record<string, string> = {
-    sno: GRAY,
-    tckimlikno: GRAY,
-    ad: GRAY,
-    departman: GRAY,
-    argegun: GRAY,
-    digergun: GRAY,
-    toplamgun: GRAY,
-    bruttemel: GRAY,
-    fazlamesai: GRAY,
+    sno: PURPLE,
+    tckimlikno: PURPLE,
+    ad: PURPLE,
+    departman: PURPLE,
+    argegun: PURPLE,
+    digergun: PURPLE,
+    toplamgun: PURPLE,
+    bruttemel: PURPLE,
+    fazlamesai: PURPLE,
     aylikust: YELLOW,
     gunlukust: YELLOW,
     argeaylikust: YELLOW,
     s5510aylik: YELLOW,
-    toplambrut: GRAY,
+    toplambrut: PURPLE,
     sgkmatrah: GREEN,
     sgkisci: GREEN,
     sgkissizlik: GREEN,
@@ -153,20 +155,20 @@ personelRouter.get("/excel", async (req, res) => {
     sgkisvisz2: BROWN,
     argesgk5: BROWN,
     sgk5746: BROWN,
-    argeucret: GRAY,
-    sgkisci2: GRAY,
-    sgkissizlik2: GRAY,
-    argegvmat: GRAY,
-    gvorani: GRAY,
-    gvtutari: GRAY,
-    agi: GRAY,
-    agimahsup: GRAY,
-    argeorani: GRAY,
-    terkingv: GRAY,
-    odenecekgv: GRAY,
+    argeucret: PURPLE,
+    sgkisci2: PURPLE,
+    sgkissizlik2: PURPLE,
+    argegvmat: PURPLE,
+    gvorani: PURPLE,
+    gvtutari: PURPLE,
+    agi: PURPLE,
+    agimahsup: PURPLE,
+    argeorani: PURPLE,
+    terkingv: PURPLE,
+    odenecekgv: PURPLE,
     damgaterkin: NAVY,
-    toplamtesvik: GRAY,
-    argemaliyet: GRAY,
+    toplamtesvik: PURPLE,
+    argemaliyet: PURPLE,
   };
 
   const headerLabels: Record<string, string> = {
@@ -319,7 +321,7 @@ personelRouter.get("/excel", async (req, res) => {
         label: "5746 SAYILI KANUN KAPSAMINDA GELİR VERGİSİ STOPAJ HESAPLAMA",
         startCol: 26,
         endCol: 36,
-        color: GRAY,
+        color: PURPLE,
       },
     ];
     groups.forEach(({ label, startCol, endCol, color }) => {
@@ -332,7 +334,7 @@ personelRouter.get("/excel", async (req, res) => {
       };
       cell.font = {
         bold: true,
-        color: { argb: color === YELLOW ? "FFFF0000" : "FFFFFFFF" },
+        color: { argb: color === YELLOW ? "0529a1" : "FFFFFFFF" },
         name: "Arial",
         size: 9,
       };
@@ -355,7 +357,7 @@ personelRouter.get("/excel", async (req, res) => {
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: bg } };
       cell.font = {
         bold: true,
-        color: { argb: bg === YELLOW ? "FFFF0000" : "FFFFFFFF" },
+        color: { argb: bg === YELLOW ? "0529a1" : "FFFFFFFF" },
         name: "Arial",
         size: 9,
       };
@@ -371,7 +373,7 @@ personelRouter.get("/excel", async (req, res) => {
     const dataStartRow = rowNum;
     personelRes.rows.forEach((p, index) => {
       const d = detayMap[p.tckimlikno] || {};
-      const bd = bordroMap[p.tckimlikno] || {}; // ← ekle
+      const bd = bordroMap[p.tckimlikno] || {};
 
       const row = sheet.getRow(rowNum);
       row.height = 18;
@@ -437,14 +439,14 @@ personelRouter.get("/excel", async (req, res) => {
 
       row.getCell("toplamtesvik").value = { formula: `Y${R}+AI${R}+AK${R}` };
       row.getCell("argemaliyet").value = {
-        formula: `I${R}+W${R}+X${R}-Y${R}-Z${R}-AJ${R}-AL${R}`,
+        formula: `H${R}+V${R}+W${R}-X${R}-Y${R}-AI${R}-AK${R}`,
       };
       for (let col = 1; col <= colDefs.length; col++) {
         const cell = row.getCell(col);
         cell.border = thinBorder;
         const key = colDefs[col - 1].key;
         if (colColors[key] === YELLOW)
-          cell.font = { color: { argb: "FFFF0000" }, name: "Arial", size: 9 };
+          cell.font = { color: { argb: "0529a1" }, name: "Arial", size: 9 };
         if (index % 2 === 0)
           cell.fill = {
             type: "pattern",

@@ -110,7 +110,19 @@ bordroRouter.get("/excel", async (req, res) => {
     ORDER BY b.personeladisoyadi
   `);
 
+  const r_isci = parseFloat(req.query.sgk_isci as string) || 0.14;
+  const r_issizlik = parseFloat(req.query.sgk_issizlik as string) || 0.01;
+  const r_isv = parseFloat(req.query.sgk_isv as string) || 0.2175;
+  const r_isvisz = parseFloat(req.query.sgk_isvisz as string) || 0.02;
+  const r_isv_arge = parseFloat(req.query.sgk_isv_arge as string) || 0.2175;
+  const r_isvisz_arge = parseFloat(req.query.sgk_isvisz_arge as string) || 0.02;
+  const r_argematrah = parseFloat(req.query.sgk_argematrah as string) || 0.05;
+  const r_sgk5746 = parseFloat(req.query.sgk_5746 as string) || 0.08375;
+  const r_isci2 = parseFloat(req.query.sgk_isci2 as string) || 0.14;
+  const r_issizlik2 = parseFloat(req.query.sgk_issizlik2 as string) || 0.01;
+
   const YELLOW = "FFFFFF00";
+  const PURPLE = "7030a0";
   const GREEN = "FF00B050";
   const BROWN = "FF843C0C";
   const NAVY = "FF1F3864";
@@ -203,21 +215,21 @@ bordroRouter.get("/excel", async (req, res) => {
   ];
 
   const colColors: Record<string, string> = {
-    sno: GRAY,
-    tckimlikno: GRAY,
-    ad: GRAY,
-    departman: GRAY,
-    gorevi: GRAY,
-    argegun: GRAY,
-    digergun: GRAY,
-    toplamgun: GRAY,
-    bruttemel: GRAY,
-    fazlamesai: GRAY,
+    sno: PURPLE,
+    tckimlikno: PURPLE,
+    ad: PURPLE,
+    departman: PURPLE,
+    gorevi: PURPLE,
+    argegun: PURPLE,
+    digergun: PURPLE,
+    toplamgun: PURPLE,
+    bruttemel: PURPLE,
+    fazlamesai: PURPLE,
     aylikust: YELLOW,
     gunlukust: YELLOW,
     argeaylikust: YELLOW,
     s5510aylik: YELLOW,
-    toplambrut: GRAY,
+    toplambrut: PURPLE,
     sgkmatrah: GREEN,
     sgkisci: GREEN,
     sgkissizlik: GREEN,
@@ -229,20 +241,20 @@ bordroRouter.get("/excel", async (req, res) => {
     sgkisvisz2: BROWN,
     argesgk5: BROWN,
     sgk5746: BROWN,
-    argeucret: GRAY,
-    sgkisci2: GRAY,
-    sgkissizlik2: GRAY,
-    argegvmat: GRAY,
-    gvorani: GRAY,
-    gvtutari: GRAY,
-    agi: GRAY,
-    agimahsup: GRAY,
-    argeorani: GRAY,
-    terkingv: GRAY,
-    odenecekgv: GRAY,
+    argeucret: PURPLE,
+    sgkisci2: PURPLE,
+    sgkissizlik2: PURPLE,
+    argegvmat: PURPLE,
+    gvorani: PURPLE,
+    gvtutari: PURPLE,
+    agi: PURPLE,
+    agimahsup: PURPLE,
+    argeorani: PURPLE,
+    terkingv: PURPLE,
+    odenecekgv: PURPLE,
     damgaterkin: NAVY,
-    toplamtesvik: GRAY,
-    argemaliyet: GRAY,
+    toplamtesvik: PURPLE,
+    argemaliyet: PURPLE,
   };
 
   const thinBorder = {
@@ -280,7 +292,7 @@ bordroRouter.get("/excel", async (req, res) => {
       label: "5746 SAYILI KANUN KAPSAMINDA GELİR VERGİSİ STOPAJ HESAPLAMA",
       startCol: 27,
       endCol: 37,
-      color: GRAY,
+      color: PURPLE,
     },
   ];
   groups.forEach(({ label, startCol, endCol, color }) => {
@@ -289,7 +301,7 @@ bordroRouter.get("/excel", async (req, res) => {
     cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: color } };
     cell.font = {
       bold: true,
-      color: { argb: color === YELLOW ? "FFFF0000" : "FFFFFFFF" },
+      color: { argb: color === YELLOW ? "0529a1" : "FFFFFFFF" },
       name: "Arial",
       size: 9,
     };
@@ -312,7 +324,7 @@ bordroRouter.get("/excel", async (req, res) => {
     cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: bg } };
     cell.font = {
       bold: true,
-      color: { argb: bg === YELLOW ? "FFFF0000" : "FFFFFFFF" },
+      color: { argb: bg === YELLOW ? "0529a1" : "FFFFFFFF" },
       name: "Arial",
       size: 9,
     };
@@ -350,25 +362,25 @@ bordroRouter.get("/excel", async (req, res) => {
       formula: `IFERROR(IF(H${R}=0,0,(I${R}/H${R}*G${R})+J${R}),0)`,
     };
 
-    row.getCell("sgkisci").value = { formula: `P${R}*0.14` };
-    row.getCell("sgkissizlik").value = { formula: `P${R}*0.01` };
-    row.getCell("sgkisv").value = { formula: `P${R}*0.2175` };
-    row.getCell("sgkisvisz").value = { formula: `P${R}*0.02` };
-    row.getCell("sgkindirim").value = { formula: `P${R}*0.05` };
+    row.getCell("sgkisci").value = { formula: `P${r_isci}` };
+    row.getCell("sgkissizlik").value = { formula: `P${r_issizlik}` };
+    row.getCell("sgkisv").value = { formula: `P${r_isv}` };
+    row.getCell("sgkisvisz").value = { formula: `P${r_isvisz}` };
+    row.getCell("sgkindirim").value = { formula: `P${R}` };
     row.getCell("argesigorta").value = {
       formula: `IFERROR(IF(H${R}=0,0,F${R}/H${R}*I${R}),0)`,
     };
 
-    row.getCell("sgkisvarge").value = { formula: `V${R}*0.2175` };
-    row.getCell("sgkisvisz2").value = { formula: `V${R}*0.02` };
-    row.getCell("argesgk5").value = { formula: `V${R}*0.05` };
-    row.getCell("sgk5746").value = { formula: `V${R}*0.1675/2` };
+    row.getCell("sgkisvarge").value = { formula: `V${R}*${r_isv_arge}` };
+    row.getCell("sgkisvisz2").value = { formula: `V${R}*${r_isvisz_arge}` };
+    row.getCell("argesgk5").value = { formula: `V${R}*${r_argematrah}` };
+    row.getCell("sgk5746").value = { formula: `V${R}*${r_sgk5746}` };
 
     row.getCell("argeucret").value = {
       formula: `IFERROR(IF(H${R}=0,0,F${R}/H${R}*I${R}),0)`,
     };
-    row.getCell("sgkisci2").value = { formula: `AA${R}*0.14` };
-    row.getCell("sgkissizlik2").value = { formula: `AA${R}*0.01` };
+    row.getCell("sgkisci2").value = { formula: `AA${R}*${r_isci2}` };
+    row.getCell("sgkissizlik2").value = { formula: `AA${R}*${r_issizlik2}` };
     row.getCell("argegvmat").value = { formula: `AA${R}-AB${R}-AC${R}` };
     row.getCell("gvtutari").value = { formula: `AD${R}*AE${R}` };
     row.getCell("agimahsup").value = { formula: `AF${R}-AG${R}` };
@@ -389,7 +401,7 @@ bordroRouter.get("/excel", async (req, res) => {
       cell.border = thinBorder;
       const key = colDefs[col - 1].key;
       if (colColors[key] === YELLOW)
-        cell.font = { color: { argb: "FFFF0000" }, name: "Arial", size: 9 };
+        cell.font = { color: { argb: "0529a1" }, name: "Arial", size: 9 };
       if (index % 2 === 0)
         cell.fill = {
           type: "pattern",

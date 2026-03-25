@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AR-GE Personel — Giriş</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --green: #28b43c;
+        --green-soft: rgba(40, 180, 60, 0.12);
+        --green-border: rgba(40, 180, 60, 0.3);
+        --bg: #111412;
+        --card: #181c19;
+        --card-border: rgba(255, 255, 255, 0.07);
+        --input-bg: #0e110f;
+        --input-border: rgba(255, 255, 255, 0.1);
+        --text: #dde8de;
+        --muted: rgba(255, 255, 255, 0.3);
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card {
+        width: 380px;
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        padding: 36px 32px 32px;
+        animation: fadeIn 0.4s ease both;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+
+      .head-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--green-soft);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--green);
+        flex-shrink: 0;
+      }
+
+      .head-title {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--card-border);
+        margin: 0 -32px 28px;
+      }
+
+      .field {
+        margin-bottom: 12px;
+        position: relative;
+      }
+
+      .field-label {
+        position: absolute;
+        top: 0;
+        left: 14px;
+        transform: translateY(-50%);
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--muted);
+        background: var(--card);
+        padding: 0 4px;
+        pointer-events: none;
+        transition: color 0.2s;
+        letter-spacing: 0.5px;
+        z-index: 1;
+      }
+
+      .field:focus-within .field-label {
+        color: var(--green);
+      }
+
+      .field-inner {
+        display: flex;
+        align-items: center;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 6px;
+        padding: 0 14px;
+        gap: 10px;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .field:focus-within .field-inner {
+        border-color: var(--green-border);
+        box-shadow: 0 0 0 3px rgba(40, 180, 60, 0.07);
+      }
+
+      .field-icon {
+        color: var(--muted);
+        flex-shrink: 0;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+      }
+
+      .field:focus-within .field-icon {
+        color: var(--green);
+      }
+
+      .field input {
+        flex: 1;
+        background: none;
+        border: none;
+        outline: none;
+        color: var(--text);
+        font-family: "DM Mono", monospace;
+        font-size: 13px;
+        padding: 13px 0;
+        letter-spacing: 0.5px;
+      }
+
+      .field input::placeholder {
+        color: transparent;
+      }
+
+      .toggle-btn {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        transition: color 0.2s;
+      }
+      .toggle-btn:hover {
+        color: var(--green);
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 18px 0 22px;
+      }
+
+      .remember {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        user-select: none;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .remember input {
+        display: none;
+      }
+
+      .cb {
+        width: 15px;
+        height: 15px;
+        border: 1px solid var(--input-border);
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .remember input:checked ~ .cb {
+        background: var(--green);
+        border-color: var(--green);
+      }
+      .remember input:checked ~ .cb::after {
+        content: "";
+        width: 4px;
+        height: 7px;
+        border: 1.5px solid #000;
+        border-top: none;
+        border-left: none;
+        transform: rotate(45deg) translateY(-1px);
+        display: block;
+      }
+
+      .forgot {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--green);
+        text-decoration: none;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+      .forgot:hover {
+        opacity: 1;
+      }
+
+      .submit-row {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: none;
+        border: 1px solid var(--green-border);
+        color: var(--green);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 11px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--green);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.25s ease;
+        z-index: 0;
+      }
+
+      .btn:hover::before {
+        transform: scaleX(1);
+      }
+      .btn:hover {
+        color: #0e110f;
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .btn span,
+      .btn svg {
+        position: relative;
+        z-index: 1;
+      }
+
+      .msg {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        padding: 10px 12px;
+        border-radius: 5px;
+        margin-top: 14px;
+        display: none;
+      }
+      .msg.error {
+        background: rgba(255, 60, 60, 0.07);
+        border: 1px solid rgba(255, 60, 60, 0.2);
+        color: #ff6b6b;
+      }
+      .msg.success {
+        background: var(--green-soft);
+        border: 1px solid var(--green-border);
+        color: var(--green);
+      }
+      .msg.show {
+        display: block;
+        animation: msgIn 0.2s ease;
+      }
+
+      @keyframes msgIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="head">
+        <div class="head-icon">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
+          </svg>
+        </div>
+        <div class="head-title">Giriş</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <div class="field-label">E-posta</div>
+        <div class="field-inner">
+          <div class="field-icon">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+          </div>
+          <input
+            type="email"
+            id="email"
+            placeholder="E-posta"
+            autocomplete="email"
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Şifre</div>
+        <div class="field-inner">
+          <div class="field-icon">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </div>
+          <input
+            type="password"
+            id="password"
+            placeholder="Şifre"
+            autocomplete="current-password"
+          />
+          <button class="toggle-btn" type="button" onclick="togglePass()">
+            <svg
+              id="eyeIcon"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="remember">
+          <input type="checkbox" id="remember" />
+          <div class="cb"></div>
+          Beni hatırla
+        </label>
+        <a href="#" class="forgot">Şifremi unuttum</a>
+      </div>
+
+      <div class="submit-row">
+        <button class="btn" id="loginBtn" onclick="handleLogin()">
+          <span id="btnText">Devam Et</span>
+          <svg
+            id="btnIcon"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="msg" id="msgBox"></div>
+    </div>
+
+    <script>
+      if (
+        localStorage.getItem("arge_token") ||
+        sessionStorage.getItem("arge_token")
+      ) {
+        window.location.href = "/index.html";
+      }
+
+      function togglePass() {
+        const input = document.getElementById("password");
+        const icon = document.getElementById("eyeIcon");
+        if (input.type === "password") {
+          input.type = "text";
+          icon.innerHTML =
+            '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"/>';
+        } else {
+          input.type = "password";
+          icon.innerHTML =
+            '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        }
+      }
+
+      function showMsg(text, type) {
+        const box = document.getElementById("msgBox");
+        box.textContent = text;
+        box.className = "msg " + type + " show";
+      }
+
+      function setLoading(v) {
+        const btn = document.getElementById("loginBtn");
+        const txt = document.getElementById("btnText");
+        const icon = document.getElementById("btnIcon");
+        btn.disabled = v;
+        txt.textContent = v ? "Doğrulanıyor..." : "Devam Et";
+        icon.style.display = v ? "none" : "";
+      }
+
+      async function handleLogin() {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const remember = document.getElementById("remember").checked;
+
+        document.getElementById("msgBox").classList.remove("show");
+
+        if (!email || !password) {
+          showMsg("⚠ Lütfen tüm alanları doldurun.", "error");
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await res.json();
+
+          if (!res.ok) {
+            showMsg("⚠ " + (data.error || "Giriş başarısız."), "error");
+            setLoading(false);
+            return;
+          }
+
+          const storage = remember ? localStorage : sessionStorage;
+          storage.setItem("arge_token", data.token);
+          storage.setItem("arge_kullanici", JSON.stringify(data.kullanici));
+
+          showMsg("✓ Giriş başarılı...", "success");
+          setTimeout(() => {
+            window.location.href = "/index.html";
+          }, 700);
+        } catch (err) {
+          showMsg("⚠ Sunucuya bağlanılamadı.", "error");
+          setLoading(false);
+        }
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") handleLogin();
+      });
+    </script>
+  </body>
+</html>

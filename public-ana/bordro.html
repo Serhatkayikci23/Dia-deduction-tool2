@@ -16,7 +16,7 @@
       }
 
       .topbar {
-        background: #1f3864;
+        background: #1a1a1a;
         color: white;
         padding: 10px 18px;
         display: flex;
@@ -49,11 +49,11 @@
         display: inline-block;
       }
       .btn-save {
-        background: #ff8c00;
+        background: #00b050;
         color: white;
       }
       .btn-save:hover {
-        background: #e07700;
+        background: #007a38;
       }
       .btn-excel:hover {
         background: #007a38;
@@ -92,13 +92,13 @@
         text-align: center;
         border: 1px solid #aaa;
       }
-      .th-gray {
-        background: #808080;
+      .th-purple {
+        background: #7030a0;
         color: white;
       }
       .th-yellow {
         background: #ffd700;
-        color: #cc0000;
+        color: #0529a1;
       }
       .th-green {
         background: #00b050;
@@ -168,7 +168,7 @@
       }
       td.calc-yellow {
         background: #fffde7 !important;
-        color: #cc0000;
+        color: #0529a1;
         font-style: italic;
         font-size: 11px;
       }
@@ -202,65 +202,71 @@
       <div class="topbar-right">
         <span id="status"></span>
         <button class="btn btn-save" onclick="saveAll()">Tümünü Kaydet</button>
-        <a class="btn btn-excel" href="/api/bordro/excel">Excel İndir</a>
+        <button class="btn btn-excel" onclick="excelIndir()">
+          Excel İndir
+        </button>
       </div>
     </div>
 
     <div class="wrap">
-      <div class="search-bar">
-        <input
-          type="text"
-          id="search"
-          placeholder="TC veya isim ara..."
-          oninput="filterRows()"
-        />
+      <div style="display: flex; align-items: center; margin-bottom: 8px">
+        <div style="flex: 1">
+          <input
+            type="text"
+            id="search"
+            placeholder="TC veya isim ara..."
+            oninput="filterRows()"
+            style="
+              padding: 5px 10px;
+              border: 1px solid #ccc;
+              border-radius: 3px;
+              width: 260px;
+              font-size: 12px;
+            "
+          />
+        </div>
+        <div style="flex: 1; text-align: center">
+          <img src="/image/deneme.png" style="height: 100px; width: auto" />
+        </div>
+        <div style="flex: 1"></div>
       </div>
       <table>
         <thead>
           <tr class="tr-group">
-            <th class="th-gray" colspan="5"></th>
-            <th class="th-gray" colspan="5">Çalışma &amp; Ücret</th>
+            <th class="th-purple" colspan="5"></th>
+            <th class="th-purple" colspan="5">Çalışma &amp; Ücret</th>
             <th class="th-yellow" colspan="4">
               SGK Aylık Ve Günlük Üst Sınır İşlemleri
             </th>
-            <th class="th-gray" colspan="1"></th>
+            <th class="th-purple" colspan="1"></th>
             <th class="th-green" colspan="6">
               5510 SAYILI KANUN KAPSAMINDA MATRAH VE %5'LİK İNDİRİM
             </th>
             <th class="th-brown" colspan="5">
               5746 SAYILI KANUN KAPSAMINDA SGK İŞVEREN PAYI HESAPLAMA
             </th>
-            <th class="th-gray" colspan="11">
+            <th class="th-purple" colspan="11">
               5746 SAYILI KANUN KAPSAMINDA GELİR VERGİSİ STOPAJ HESAPLAMA
             </th>
             <th class="th-navy" colspan="1"></th>
-            <th class="th-gray" colspan="2"></th>
+            <th class="th-purple" colspan="2"></th>
           </tr>
           <tr class="tr-header">
-            <th class="th-gray">S/NO</th>
-            <th class="th-gray">TC KİMLİK NO</th>
-            <th class="th-gray">AD SOYAD</th>
-            <th class="th-gray">DEPARTMAN</th>
-            <th class="th-gray">GÖREVİ</th>
-            <th class="th-gray">ARGE MERKEZİNDE ÇALIŞILAN GÜN SAYISI</th>
-            <th class="th-gray">DİĞER FAALİYETLERDE ÇALIŞMA GÜN SAYISI</th>
-            <th class="th-gray">TOPLAM ÇALIŞMA GÜN SAYISI</th>
-            <th class="th-gray">BRÜT TEMEL ÜCRET</th>
-            <th class="th-gray">FAZLA MESAİ - EK ÜCRET</th>
-            <th class="th-yellow">
-              Aylık Üst Sınır<br /><input
-                type="number"
-                id="r_isci"
-                class="rate-inp"
-                step="0.001"
-                value="0.14"
-                oninput="recalcAll()"
-              />
-            </th>
+            <th class="th-purple">S/NO</th>
+            <th class="th-purple">TC KİMLİK NO</th>
+            <th class="th-purple">AD SOYAD</th>
+            <th class="th-purple">DEPARTMAN</th>
+            <th class="th-purple">GÖREVİ</th>
+            <th class="th-purple">ARGE MERKEZİNDE ÇALIŞILAN GÜN SAYISI</th>
+            <th class="th-purple">DİĞER FAALİYETLERDE ÇALIŞMA GÜN SAYISI</th>
+            <th class="th-purple">TOPLAM ÇALIŞMA GÜN SAYISI</th>
+            <th class="th-purple">BRÜT TEMEL ÜCRET</th>
+            <th class="th-purple">FAZLA MESAİ - EK ÜCRET</th>
+            <th class="th-yellow">Aylık Üst Sınır</th>
             <th class="th-yellow">Günlük Üst Sınır</th>
             <th class="th-yellow">AR-GE Aylık Üst Sınır</th>
             <th class="th-yellow">5510 Aylık Üst Sınır</th>
-            <th class="th-gray">TOPLAM BRÜT ÜCRET</th>
+            <th class="th-purple">TOPLAM BRÜT ÜCRET</th>
             <th class="th-green">
               5510 SGK MATRAHI (DİĞER FAAL, İKRAMİYE PRİM, MESAİ)
             </th>
@@ -328,28 +334,10 @@
                 oninput="recalcAll()"
               />
             </th>
-            <th class="th-brown">
-              ARGE MATRAHINDAN 5510 SGK İNDİRİMİ %5<br /><input
-                type="number"
-                id="r_argematrah"
-                class="rate-inp"
-                step="0.001"
-                value="0.05"
-                oninput="recalcAll()"
-              />
-            </th>
-            <th class="th-brown">
-              5746 SGK İNDİRİMİ %50<br /><input
-                type="number"
-                id="r_sgk5746"
-                class="rate-inp"
-                step="0.0001"
-                value="0.08375"
-                oninput="recalcAll()"
-              />
-            </th>
-            <th class="th-gray">ARGE MERKEZİNDEKİ ÜCRET</th>
-            <th class="th-gray">
+            <th class="th-brown">ARGE MATRAHINDAN 5510 SGK İNDİRİMİ %5</th>
+            <th class="th-brown">5746 SGK İNDİRİMİ %50</th>
+            <th class="th-purple">ARGE MERKEZİNDEKİ ÜCRET</th>
+            <th class="th-purple">
               SGK İşçi Payı<br /><input
                 type="number"
                 id="r_iscipayi1"
@@ -359,7 +347,7 @@
                 oninput="recalcAll()"
               />
             </th>
-            <th class="th-gray">
+            <th class="th-purple">
               SGK İşçi İşsizlik Payı<br /><input
                 type="number"
                 id="r_sgk_issizlik1"
@@ -369,21 +357,21 @@
                 oninput="recalcAll()"
               />
             </th>
-            <th class="th-gray">AR-GE GELİR VERGİSİ MATRAHI</th>
-            <th class="th-gray">GELİR VERGİSİ ORANI</th>
-            <th class="th-gray">GELİR VERGİSİ TUTARI</th>
-            <th class="th-gray">AGİ</th>
-            <th class="th-gray">AGİ MAHSUBU SONRASI GELİR VERGİSİ TUTARI</th>
-            <th class="th-gray">ARGE İSTİSNA ORANI</th>
-            <th class="th-gray">
+            <th class="th-purple">AR-GE GELİR VERGİSİ MATRAHI</th>
+            <th class="th-purple">GELİR VERGİSİ ORANI</th>
+            <th class="th-purple">GELİR VERGİSİ TUTARI</th>
+            <th class="th-purple">AGİ</th>
+            <th class="th-purple">AGİ MAHSUBU SONRASI GELİR VERGİSİ TUTARI</th>
+            <th class="th-purple">ARGE İSTİSNA ORANI</th>
+            <th class="th-purple">
               5746 SAYILI KANUN KAPSAMINDA DAMGA TERKİN EDİLECEK DAMGA VERGİSİ
             </th>
-            <th class="th-gray">ÖDENECEK GV STOPAJ</th>
+            <th class="th-purple">ÖDENECEK GV STOPAJ</th>
             <th class="th-navy">
               5746 SAYILI KANUN KAPSAMINDA TERKİN EDİLECEK DAMGA VERGİSİ
             </th>
-            <th class="th-gray">TOPLAM TEŞVİK TUTARI (SGK,GV,DV)</th>
-            <th class="th-gray">ARGE İŞV MALİYETİ</th>
+            <th class="th-purple">TOPLAM TEŞVİK TUTARI (SGK,GV,DV)</th>
+            <th class="th-purple">ARGE İŞV MALİYETİ</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -391,6 +379,19 @@
     </div>
 
     <script>
+      function excelIndir() {
+        const params = new URLSearchParams({
+          sgk_isci: document.getElementById("r_sgkisci").value,
+          sgk_issizlik: document.getElementById("r_issizlik").value,
+          sgk_isv: document.getElementById("r_isv").value,
+          sgk_isvisz: document.getElementById("r_isvisz").value,
+          sgk_isv_arge: document.getElementById("r_isv_arge").value,
+          sgk_isvisz_arge: document.getElementById("r_isvisz_arge").value,
+          sgk_isci2: document.getElementById("r_iscipayi1").value,
+          sgk_issizlik2: document.getElementById("r_sgk_issizlik1").value,
+        });
+        window.location.href = `/api/bordro/excel?${params}`;
+      }
       let personelData = [];
 
       const n = (v) => parseFloat(v) || 0;
@@ -422,6 +423,17 @@
         const r_isvisz =
           parseFloat(document.getElementById("r_isvisz")?.value) || 0.02;
 
+        const r_isv_arge =
+          parseFloat(document.getElementById("r_isv_arge")?.value) || 0.2175;
+        const r_isvisz_arge =
+          parseFloat(document.getElementById("r_isvisz_arge")?.value) || 0.02;
+        const r_argematrah = 0.05;
+
+        const r_sgk5746 = 0.08375;
+        const r_isci2 =
+          parseFloat(document.getElementById("r_iscipayi1")?.value) || 0.14;
+        const r_issizlik2 =
+          parseFloat(document.getElementById("r_sgk_issizlik1")?.value) || 0.01;
         const gunlukust = aylikust / 30;
         const argeaylikust = argegun * gunlukust;
         const s5510aylik = digergun * gunlukust;
@@ -435,14 +447,14 @@
         const sgkindirim = sgkmatrah * 0.05;
         const argesigorta =
           toplamgun === 0 ? 0 : (argegun / toplamgun) * bruttemel;
-        const sgkisvarge = argesigorta * r_isv;
-        const sgkisvisz2 = argesigorta * r_isvisz;
+        const sgkisvarge = argesigorta * r_isv_arge;
+        const sgkisvisz2 = argesigorta * r_isvisz_arge;
         const argesgk5 = argesigorta * 0.05;
         const sgk5746 = (argesigorta * 0.1675) / 2;
         const argeucret =
           toplamgun === 0 ? 0 : (argegun / toplamgun) * bruttemel;
-        const sgkisci2 = argeucret * r_isci;
-        const sgkissizlik2 = argeucret * r_issizlik;
+        const sgkisci2 = argeucret * r_isci2;
+        const sgkissizlik2 = argeucret * r_issizlik2;
         const argegvmat = argeucret - sgkisci2 - sgkissizlik2;
         const gvtutari = argegvmat * gvorani;
         const agimahsup = gvtutari - agi;
@@ -623,8 +635,8 @@
         const st = document.getElementById("status");
         st.textContent =
           fail === 0
-            ? `✓ ${ok} kayıt kaydedildi`
-            : `⚠ ${ok} başarılı, ${fail} hata`;
+            ? ` ${ok} kayıt kaydedildi`
+            : ` ${ok} başarılı, ${fail} hata`;
         setTimeout(() => (st.textContent = ""), 3000);
       }
 

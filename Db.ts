@@ -4,8 +4,8 @@ export const db = new pg.Pool({
   host: "127.0.0.1",
   port: 5432,
   database: "dia-deduction-tool2",
-  user: "postgres",
-  password: "123",
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
 });
 
 export const baseUrl = "https://diademo.ws.dia.com.tr/api/v3";

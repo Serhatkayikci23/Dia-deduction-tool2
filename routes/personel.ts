@@ -1,6 +1,6 @@
 import { Router } from "express";
 import ExcelJS from "exceljs";
-import { db } from "../Db.ts";
+import { db } from "../db.js";
 
 export const personelRouter = Router();
 
@@ -32,8 +32,9 @@ export async function setupPersonel(data: any[]) {
       UNIQUE(tckimlikno, proje_kodu)
     )
   `);
+  const limitliData = data.slice(0, 3);
 
-  for (const p of data) {
+  for (const p of limitliData) {
     await db.query(
       `INSERT INTO personel (tckimlikno, personeladisoyadi, persdepartmanaciklama, gorevi)
        VALUES ($1,$2,$3,$4) ON CONFLICT (tckimlikno) DO UPDATE SET
@@ -109,7 +110,7 @@ personelRouter.get("/excel", async (req, res) => {
   const oranMap: Record<string, Record<string, number>> = {};
   for (const o of oranlarRes.rows) {
     if (!oranMap[o.tckimlikno]) oranMap[o.tckimlikno] = {};
-    oranMap[o.tckimlikno][o.proje_kodu] = parseFloat(o.oran) || 0;
+    oranMap[o.tckimlikno]![o.proje_kodu] = parseFloat(o.oran) || 0;
   }
 
   const r_isci = parseFloat(req.query.sgk_isci as string) || 0.14;
@@ -385,8 +386,11 @@ personelRouter.get("/excel", async (req, res) => {
 
       row.getCell("digergun").value = parseFloat(bd.digergun) || 0;
       row.getCell("toplamgun").value = parseFloat(bd.toplamgun) || 0;
-      row.getCell("bruttemel").value = parseFloat(bd.bruttemel) || 0;
-      row.getCell("fazlamesai").value = parseFloat(bd.fazlamesai) || 0;
+      const adamAyOrani = oranMap[p.tckimlikno]?.[proje.proje_kodu] || 0;
+      row.getCell("bruttemel").value =
+        (parseFloat(bd.bruttemel) || 0) * adamAyOrani;
+      row.getCell("fazlamesai").value =
+        (parseFloat(bd.fazlamesai) || 0) * adamAyOrani;
       row.getCell("aylikust").value = parseFloat(d.aylikust) || 0;
       row.getCell("gvorani").value = parseFloat(d.gvorani) || 0;
       row.getCell("agi").value = parseFloat(d.agi) || 0;
@@ -433,8 +437,6 @@ personelRouter.get("/excel", async (req, res) => {
       row.getCell("odenecekgv").value = { formula: `AG${R}-AI${R}` };
 
       const damgaAylik = parseFloat(bd.damgaterkin) || 0;
-
-      const adamAyOrani = oranMap[p.tckimlikno]?.[proje.proje_kodu] || 0;
       row.getCell("damgaterkin").value = damgaAylik * adamAyOrani;
 
       row.getCell("toplamtesvik").value = { formula: `Y${R}+AI${R}+AK${R}` };
@@ -444,7 +446,7 @@ personelRouter.get("/excel", async (req, res) => {
       for (let col = 1; col <= colDefs.length; col++) {
         const cell = row.getCell(col);
         cell.border = thinBorder;
-        const key = colDefs[col - 1].key;
+        const key = colDefs[col - 1]!.key;
         if (colColors[key] === YELLOW)
           cell.font = { color: { argb: "0529a1" }, name: "Arial", size: 9 };
         if (index % 2 === 0)
@@ -475,7 +477,7 @@ personelRouter.get("/excel", async (req, res) => {
       ["sgk5746", "Y"],
       ["toplamtesvik", "AL"],
     ].forEach(([key, col]) => {
-      totalRow.getCell(key).value = {
+      totalRow.getCell(key!).value = {
         formula: `SUM(${col}${dataStartRow}:${col}${lastDataRow})`,
       };
     });

@@ -78,9 +78,9 @@
 
       .btn-back {
         font-size: 11px;
-        color: var(--muted);
-        background: none;
-        border: 1px solid var(--card-border);
+        color: #fff;
+        background: var(--green);
+        border: 1px solid var(--green);
         padding: 7px 14px;
         border-radius: 5px;
         cursor: pointer;
@@ -91,8 +91,7 @@
         transition: all 0.2s;
       }
       .btn-back:hover {
-        color: var(--green);
-        border-color: var(--green-border);
+        opacity: 0.88;
       }
 
       .add-card {
@@ -282,6 +281,7 @@
         font-size: 13px;
         font-weight: bold;
         margin-bottom: 16px;
+        color: #1a1a1a;
       }
       .modal-actions {
         display: flex;
@@ -434,50 +434,59 @@
       var aktifId = null;
 
       async function kullanicilariGetir() {
-        var res = await fetch("/api/auth/kullanicilar", {
-          headers: { Authorization: "Bearer " + token },
-        });
-        var data = await res.json();
-
-        document.getElementById("user-count").textContent =
-          data.length + " kayıt";
-
-        if (!data.length) {
+        try {
+          var res = await fetch("/api/auth/kullanicilar", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!res.ok) {
+            document.getElementById("tablo-body").innerHTML =
+              '<tr><td colspan="5"><div class="empty">Yüklenemedi: ' +
+              res.status +
+              "</div></td></tr>";
+            return;
+          }
+          var data = await res.json();
+          document.getElementById("user-count").textContent =
+            data.length + " kayıt";
+          if (!data.length) {
+            document.getElementById("tablo-body").innerHTML =
+              '<tr><td colspan="5"><div class="empty">Henüz kullanıcı yok.</div></td></tr>';
+            return;
+          }
+          document.getElementById("tablo-body").innerHTML = data
+            .map(function (u) {
+              return (
+                "<tr>" +
+                '<td class="td-muted">' +
+                u.id +
+                "</td>" +
+                "<td>" +
+                u.ad +
+                "</td>" +
+                "<td>" +
+                u.email +
+                "</td>" +
+                '<td class="td-muted">' +
+                new Date(u.olusturma).toLocaleDateString("tr-TR") +
+                "</td>" +
+                '<td><div class="actions">' +
+                '<button class="btn-sifre" onclick="modalAc(' +
+                u.id +
+                ')">Şifre Değiştir</button>' +
+                '<button class="btn-sil" onclick="kullaniciSil(' +
+                u.id +
+                ", '" +
+                u.ad +
+                "')\">Sil</button>" +
+                "</div></td></tr>"
+              );
+            })
+            .join("");
+        } catch (err) {
+          console.error("Liste hatası:", err);
           document.getElementById("tablo-body").innerHTML =
-            '<tr><td colspan="5"><div class="empty">Henüz kullanıcı yok.</div></td></tr>';
-          return;
+            '<tr><td colspan="5"><div class="empty">Bağlantı hatası.</div></td></tr>';
         }
-
-        document.getElementById("tablo-body").innerHTML = data
-          .map(function (u) {
-            return (
-              "<tr>" +
-              '<td class="td-muted">' +
-              u.id +
-              "</td>" +
-              "<td>" +
-              u.ad +
-              "</td>" +
-              "<td>" +
-              u.email +
-              "</td>" +
-              '<td class="td-muted">' +
-              new Date(u.olusturma).toLocaleDateString("tr-TR") +
-              "</td>" +
-              '<td><div class="actions">' +
-              '<button class="btn-sifre" onclick="modalAc(' +
-              u.id +
-              ')">Şifre Değiştir</button>' +
-              '<button class="btn-sil" onclick="kullaniciSil(' +
-              u.id +
-              ", '" +
-              u.ad +
-              "')\">Sil</button>" +
-              "</div></td>" +
-              "</tr>"
-            );
-          })
-          .join("");
       }
 
       async function kullaniciEkle() {
@@ -485,14 +494,12 @@
         var email = document.getElementById("yeni-email").value.trim();
         var sifre = document.getElementById("yeni-sifre").value;
         var msg = document.getElementById("ekle-msg");
-
         msg.className = "msg";
         if (!ad || !email || !sifre) {
           msg.textContent = "Tüm alanlar zorunludur.";
           msg.className = "msg error";
           return;
         }
-
         var res = await fetch("/api/auth/kullanicilar/ekle", {
           method: "POST",
           headers: {
@@ -502,13 +509,11 @@
           body: JSON.stringify({ ad: ad, email: email, password: sifre }),
         });
         var data = await res.json();
-
         if (!res.ok) {
           msg.textContent = data.error || "Hata oluştu.";
           msg.className = "msg error";
           return;
         }
-
         msg.textContent = "Kullanıcı eklendi.";
         msg.className = "msg success";
         document.getElementById("yeni-ad").value = "";
@@ -553,13 +558,11 @@
       async function sifreDegistir() {
         var sifre = document.getElementById("yeni-sifre-modal").value;
         var msg = document.getElementById("sifre-msg");
-
         if (!sifre) {
           msg.textContent = "Şifre boş olamaz.";
           msg.className = "msg error";
           return;
         }
-
         var res = await fetch("/api/auth/kullanicilar/sifre", {
           method: "POST",
           headers: {
@@ -568,13 +571,11 @@
           },
           body: JSON.stringify({ id: aktifId, password: sifre }),
         });
-
         if (!res.ok) {
           msg.textContent = "Hata oluştu.";
           msg.className = "msg error";
           return;
         }
-
         msg.textContent = "Şifre güncellendi.";
         msg.className = "msg success";
         setTimeout(modalKapat, 1200);

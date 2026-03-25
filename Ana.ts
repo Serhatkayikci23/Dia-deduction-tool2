@@ -2,11 +2,11 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { db, baseUrl, firmCode, periodCode, setSessionId } from "./Db.ts";
-import { personelRouter, setupPersonel } from "./routes/personel.ts";
-import { projeRouter, setupProje } from "./routes/proje.ts";
-import { bordroRouter, setupBordro } from "./routes/bordro.ts";
-import { authRouter } from "./routes/auth.ts";
+import { db, baseUrl, firmCode, periodCode, setSessionId } from "./db.js";
+import { personelRouter, setupPersonel } from "./routes/personel.js";
+import { projeRouter, setupProje } from "./routes/proje.js";
+import { bordroRouter, setupBordro } from "./routes/bordro.js";
+import { authRouter } from "./routes/auth.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,16 +76,16 @@ async function main() {
     "persdepartmanaciklama",
     "gorevi",
   ]);
+  const limitliData = data4.slice(0, 3);
 
-  await setupPersonel(data4);
+  await setupPersonel(limitliData);
   console.log("Personel setup OK");
-  await setupProje(data4);
+  await setupProje(limitliData);
   console.log("Proje setup OK");
-  await setupBordro(data4);
+  await setupBordro(limitliData);
   console.log("Bordro setup OK");
 
-  console.log(`${data4.length} personel aktarıldı`);
-
+  console.log(`${limitliData.length} personel aktarıldı`);
   app.listen(5000, () => console.log("Sunucu: http://localhost:5000"));
 }
 

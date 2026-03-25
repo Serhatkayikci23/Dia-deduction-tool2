@@ -1,473 +1,450 @@
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  body {
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    background: #f0f0f0;
-  }
-
-  .topbar {
-    background: #1a1a1a;
-    color: white;
-    padding: 10px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .topbar h1 {
-    font-size: 15px;
-    color: #28b43c;
-  }
-  .topbar-right {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .btn {
-    padding: 5px 14px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
-  }
-  .btn-excel {
-    background: #00b050;
-    color: white;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-save {
-    background: #00b050;
-    color: white;
-  }
-  .btn-save:hover {
-    background: #00b050;
-  }
-  .btn-excel:hover {
-    background: #007a38;
-  }
-  #status {
-    color: #020802;
-    font-size: 11px;
-    min-width: 160px;
-  }
-
-  .wrap {
-    padding: 10px;
-    overflow-x: auto;
-  }
-  .search-bar {
-    margin-bottom: 12px;
-  }
-  .search-bar input {
-    padding: 5px 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    width: 260px;
-    font-size: 12px;
-  }
-
-  .proje-section {
-    margin-bottom: 32px;
-  }
-  .proje-baslik {
-    background: #27cc06be;
-    color: white;
-    font-size: 13px;
-    font-weight: bold;
-    padding: 7px 14px;
-    border-radius: 4px 4px 0 0;
-    display: inline-block;
-  }
-
-  table {
-    border-collapse: collapse;
-    white-space: nowrap;
-    background: white;
-  }
-
-  .tr-group th {
-    font-size: 10px;
-    font-weight: bold;
-    padding: 5px 4px;
-    text-align: center;
-    border: 1px solid #aaa;
-  }
-  .th-purple {
-    background: #7030a0;
-    color: white;
-  }
-  .th-yellow {
-    background: #ffd700;
-    color: #0529a1;
-  }
-  .th-green {
-    background: #00b050;
-    color: white;
-  }
-  .th-brown {
-    background: #843c0c;
-    color: white;
-  }
-  .th-navy {
-    background: #1f3864;
-    color: white;
-  }
-
-  .tr-header th {
-    font-size: 10px;
-    font-weight: bold;
-    padding: 4px 5px;
-    text-align: center;
-    border: 1px solid #aaa;
-    max-width: 90px;
-    white-space: normal;
-    line-height: 1.3;
-    vertical-align: middle;
-  }
-
-  td {
-    padding: 3px 5px;
-    border: 1px solid #ddd;
-    text-align: center;
-    vertical-align: middle;
-  }
-  td.left {
-    text-align: left;
-  }
-  td.fixed {
-    background: #ececec !important;
-    color: #333;
-    font-weight: bold;
-  }
-  tr:nth-child(even) td:not(.fixed) {
-    background: #f9f9f9;
-  }
-  tr:hover td {
-    background: #e8f4ff !important;
-  }
-
-  td input[type="number"] {
-    width: 72px;
-    padding: 2px 4px;
-    border: 1px solid #ccc;
-    border-radius: 2px;
-    font-size: 11px;
-    text-align: right;
-    background: #fffde7;
-  }
-  td input[type="number"]:focus {
-    outline: 2px solid #1f3864;
-    background: white;
-  }
-
-  td.calc {
-    background: #f5f5f5;
-    color: #555;
-    font-style: italic;
-    font-size: 11px;
-  }
-  td.calc-yellow {
-    background: #fffde7 !important;
-    color: #0529a1;
-    font-style: italic;
-    font-size: 11px;
-  }
-  td.input-yellow {
-    background: #fffde7;
-  }
-
-  .rate-inp {
-    display: block;
-    width: 58px;
-    margin: 4px auto 0;
-    padding: 2px 3px;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 2px;
-    font-size: 10px;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    font-weight: bold;
-  }
-  .rate-inp:focus {
-    outline: 2px solid #ffd700;
-    background: white;
-    color: #333;
-  }
-
-  .overflow-auto {
-    overflow: auto;
-  }
-</style>
-
-<div class="topbar">
-  <h1>Personel Yönetim Sistemi</h1>
-  <div class="topbar-right">
-    <span id="status"></span>
-    <button class="btn btn-save" onclick="saveAll()">Tümünü Kaydet</button>
-    <button class="btn btn-excel" onclick="excelIndir()">Excel İndir</button>
-  </div>
-</div>
-
-<div class="wrap">
-  <div style="display: flex; align-items: center; margin-bottom: 8px">
-    <div style="flex: 1">
-      <input
-        type="text"
-        id="search"
-        placeholder="TC veya isim ara..."
-        oninput="filterRows()"
-        style="
-          padding: 5px 10px;
-          border: 1px solid #ccc;
-          border-radius: 3px;
-          width: 260px;
-          font-size: 12px;
-        "
-      />
-    </div>
-    <div style="flex: 1; text-align: center">
-      <img src="/image/deneme.png" style="height: 100px; width: auto" />
-    </div>
-    <div style="flex: 1"></div>
-  </div>
-  <div id="projeSections"></div>
-
-  <script>
-    let oranlar = {
-      sgk_isci: 0.14,
-      sgk_issizlik: 0.01,
-      sgk_isv: 0.2175,
-      sgk_isvisz: 0.02,
-    };
-
-    function updateOran(key, val) {
-      const parsed = parseFloat(val);
-      if (!isNaN(parsed)) {
-        oranlar[key] = parsed;
-        recalcAll();
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Personel Yönetim Sistemi</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    }
-
-    let personelData = [];
-    let projeler = [];
-    let detayMap = {};
-    let oranlarMap = {};
-
-    const n = (v) => parseFloat(v) || 0;
-    const fmt = (v) =>
-      v === 0
-        ? "0,00"
-        : n(v).toLocaleString("tr-TR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          });
-
-    function calc(p) {
-      const argegun = n(p.argegun);
-      const digergun = n(p.digergun);
-      const toplamgun = n(p.toplamgun);
-      const bruttemel = n(p.bruttemel);
-      const fazlamesai = n(p.fazlamesai);
-      const aylikust = n(p.aylikust);
-      const argeorani = n(p.argeorani);
-      const agi = n(p.agi);
-      const gvorani = n(p.gvorani);
-
-      const r_isci = oranlar.sgk_isci;
-      const r_issizlik = oranlar.sgk_issizlik;
-      const r_isv = oranlar.sgk_isv;
-      const r_isvisz = oranlar.sgk_isvisz;
-
-      const gunlukust = aylikust / 30;
-      const argeaylikust = argegun * gunlukust;
-      const s5510aylik = digergun * gunlukust;
-      const toplambrut = bruttemel + fazlamesai;
-      const sgkmatrah =
-        toplamgun === 0 ? 0 : (bruttemel / toplamgun) * digergun + fazlamesai;
-
-      const sgkisci = sgkmatrah * r_isci;
-      const sgkissizlik = sgkmatrah * r_issizlik;
-      const sgkisv = sgkmatrah * r_isv;
-      const sgkisvisz = sgkmatrah * r_isvisz;
-      const sgkindirim = sgkmatrah * 0.05;
-
-      const argesigorta =
-        toplamgun === 0 ? 0 : (argegun / toplamgun) * bruttemel;
-      const sgkisvarge = argesigorta * r_isv;
-      const sgkisvisz2 = argesigorta * r_isvisz;
-      const argesgk5 = argesigorta * 0.05;
-      const sgk5746 = (argesigorta * 0.1675) / 2;
-
-      const argeucret = toplamgun === 0 ? 0 : (argegun / toplamgun) * bruttemel;
-      const sgkisci2 = argeucret * r_isci;
-      const sgkissizlik2 = argeucret * r_issizlik;
-      const argegvmat = argeucret - sgkisci2 - sgkissizlik2;
-      const gvtutari = argegvmat * gvorani;
-      const agimahsup = gvtutari - agi;
-      const terkingv = agimahsup * argeorani;
-      const odenecekgv = agimahsup - terkingv;
-      const damgaterkin =
-        toplamgun > 0
-          ? Math.max(((bruttemel * 0.00759 - 250.7) / toplamgun) * argegun, 0)
-          : 0;
-
-      const argemaliyet =
-        bruttemel +
-        sgkisvarge +
-        sgkisvisz2 -
-        argesgk5 -
-        sgk5746 -
-        terkingv -
-        damgaterkin;
-
-      const toplamtesvik = sgk5746 + terkingv + damgaterkin;
-      return {
-        gunlukust,
-        argeaylikust,
-        s5510aylik,
-        toplambrut,
-        sgkmatrah,
-        sgkisci,
-        sgkissizlik,
-        sgkisv,
-        sgkisvisz,
-        sgkindirim,
-        argesigorta,
-        sgkisvarge,
-        sgkisvisz2,
-        argesgk5,
-        sgk5746,
-        argeucret,
-        sgkisci2,
-        sgkissizlik2,
-        argegvmat,
-        gvtutari,
-        agimahsup,
-        terkingv,
-        odenecekgv,
-        argemaliyet,
-        damgaterkin,
-        toplamtesvik,
-      };
-    }
-
-    function getDetay(proje_kodu, tckimlikno) {
-      if (!detayMap[proje_kodu]) detayMap[proje_kodu] = {};
-      if (!detayMap[proje_kodu][tckimlikno])
-        detayMap[proje_kodu][tckimlikno] = {};
-      return detayMap[proje_kodu][tckimlikno];
-    }
-
-    function updateDetay(proje_kodu, tckimlikno, field, val) {
-      const bordroFields = [
-        "argegun",
-        "digergun",
-        "toplamgun",
-        "bruttemel",
-        "fazlamesai",
-      ];
-      if (bordroFields.includes(field)) {
-        console.warn(`${field} bordro'dan gelir, burda güncellenemez`);
-        return;
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        background: #f0f0f0;
       }
-      getDetay(proje_kodu, tckimlikno)[field] = parseFloat(val) || 0;
-    }
 
-    function recalcRow(proje_kodu, tckimlikno) {
-      const row = document.querySelector(
-        `tr[data-key="${proje_kodu}_${tckimlikno}"]`,
-      );
-      if (!row) return;
+      .topbar {
+        background: #1a1a1a;
+        color: white;
+        padding: 10px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .topbar h1 {
+        font-size: 15px;
+        color: #28b43c;
+      }
+      .topbar-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .btn {
+        padding: 5px 14px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .btn-excel {
+        background: #00b050;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn-save {
+        background: #00b050;
+        color: white;
+      }
+      .btn-save:hover {
+        background: #00b050;
+      }
+      .btn-excel:hover {
+        background: #007a38;
+      }
+      #status {
+        color: #020802;
+        font-size: 11px;
+        min-width: 160px;
+      }
 
-      const p = personelData.find((x) => x.tckimlikno === tckimlikno);
-      if (!p) return;
+      .wrap {
+        padding: 10px;
+        overflow-x: auto;
+      }
+      .search-bar {
+        margin-bottom: 12px;
+      }
+      .search-bar input {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        width: 260px;
+        font-size: 12px;
+      }
 
-      const projDetay = getDetay(proje_kodu, tckimlikno);
+      .proje-section {
+        margin-bottom: 32px;
+      }
+      .proje-baslik {
+        background: #27cc06be;
+        color: white;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 7px 14px;
+        border-radius: 4px 4px 0 0;
+        display: inline-block;
+      }
 
-      row
-        .querySelectorAll("input[data-field]:not([disabled])")
-        .forEach((el) => {
-          projDetay[el.dataset.field] = parseFloat(el.value) || 0;
-        });
+      table {
+        border-collapse: collapse;
+        white-space: nowrap;
+        background: white;
+      }
 
-      const d = {
-        argegun: n(p.argegun),
-        digergun: n(p.digergun),
-        toplamgun: n(p.toplamgun),
-        bruttemel: n(p.bruttemel),
-        fazlamesai: n(p.fazlamesai),
-        aylikust: n(projDetay.aylikust),
-        argeorani: n(projDetay.argeorani),
-        agi: n(projDetay.agi),
-        gvorani: n(projDetay.gvorani),
-      };
+      .tr-group th {
+        font-size: 10px;
+        font-weight: bold;
+        padding: 5px 4px;
+        text-align: center;
+        border: 1px solid #aaa;
+      }
+      .th-purple {
+        background: #7030a0;
+        color: white;
+      }
+      .th-yellow {
+        background: #ffd700;
+        color: #0529a1;
+      }
+      .th-green {
+        background: #00b050;
+        color: white;
+      }
+      .th-brown {
+        background: #843c0c;
+        color: white;
+      }
+      .th-navy {
+        background: #1f3864;
+        color: white;
+      }
 
-      const c = calc(d);
+      .tr-header th {
+        font-size: 10px;
+        font-weight: bold;
+        padding: 4px 5px;
+        text-align: center;
+        border: 1px solid #aaa;
+        max-width: 90px;
+        white-space: normal;
+        line-height: 1.3;
+        vertical-align: middle;
+      }
 
-      const toplamgun = n(p.toplamgun);
-      const bruttemel = n(p.bruttemel);
-      const argegun = n(p.argegun);
-      const damgaAylik =
-        toplamgun > 0
-          ? Math.max(((bruttemel * 0.00759 - 250.7) / toplamgun) * argegun, 0)
-          : 0;
-      const adamAyOrani = oranlarMap[tckimlikno]?.[proje_kodu] || 0;
-      c.damgaterkin = n(p.damgaterkin) * adamAyOrani;
-      c.toplamtesvik = c.sgk5746 + c.terkingv + c.damgaterkin;
-      c.argemaliyet =
-        n(p.bruttemel) +
-        c.sgkisvarge +
-        c.sgkisvisz2 -
-        c.argesgk5 -
-        c.sgk5746 -
-        c.terkingv -
-        c.damgaterkin;
+      td {
+        padding: 3px 5px;
+        border: 1px solid #ddd;
+        text-align: center;
+        vertical-align: middle;
+      }
+      td.left {
+        text-align: left;
+      }
+      td.fixed {
+        background: #ececec !important;
+        color: #333;
+        font-weight: bold;
+      }
+      tr:nth-child(even) td:not(.fixed) {
+        background: #f9f9f9;
+      }
+      tr:hover td {
+        background: #e8f4ff !important;
+      }
 
-      Object.keys(c).forEach((key) => {
-        const td = row.querySelector(`td[data-calc="${key}"]`);
-        if (td) td.textContent = fmt(c[key]);
-      });
-    }
+      td input[type="number"] {
+        width: 72px;
+        padding: 2px 4px;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        font-size: 11px;
+        text-align: right;
+        background: #fffde7;
+      }
+      td input[type="number"]:focus {
+        outline: 2px solid #1f3864;
+        background: white;
+      }
 
-    function recalcAll() {
-      projeler.forEach((proje) => {
-        personelData.forEach((p) => {
-          recalcRow(proje.proje_kodu, p.tckimlikno);
-        });
-      });
-    }
+      td.calc {
+        background: #f5f5f5;
+        color: #555;
+        font-style: italic;
+        font-size: 11px;
+      }
+      td.calc-yellow {
+        background: #fffde7 !important;
+        color: #0529a1;
+        font-style: italic;
+        font-size: 11px;
+      }
+      td.input-yellow {
+        background: #fffde7;
+      }
 
-    function makeTableHTML(proje) {
-      const pk = proje.proje_kodu;
-      const rows = personelData
-        .map((p, idx) => {
-          const projDetay = getDetay(pk, p.tckimlikno);
+      .rate-inp {
+        display: block;
+        width: 58px;
+        margin: 4px auto 0;
+        padding: 2px 3px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 2px;
+        font-size: 10px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-weight: bold;
+      }
+      .rate-inp:focus {
+        outline: 2px solid #ffd700;
+        background: white;
+        color: #333;
+      }
+
+      .overflow-auto {
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <h1>Personel Yönetim Sistemi</h1>
+      <div class="topbar-right">
+        <span id="status"></span>
+        <button class="btn btn-save" onclick="saveAll()">Tümünü Kaydet</button>
+        <button class="btn btn-excel" onclick="excelIndir()">
+          Excel İndir
+        </button>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div style="display: flex; align-items: center; margin-bottom: 8px">
+        <div style="flex: 1">
+          <input
+            type="text"
+            id="search"
+            placeholder="TC veya isim ara..."
+            oninput="filterRows()"
+            style="
+              padding: 5px 10px;
+              border: 1px solid #ccc;
+              border-radius: 3px;
+              width: 260px;
+              font-size: 12px;
+            "
+          />
+        </div>
+        <div style="flex: 1; text-align: center">
+          <img src="/image/deneme.png" style="height: 100px; width: auto" />
+        </div>
+        <div style="flex: 1"></div>
+      </div>
+      <div id="projeSections"></div>
+
+      <script>
+        let oranlar = {
+          sgk_isci: 0.14,
+          sgk_issizlik: 0.01,
+          sgk_isv: 0.2175,
+          sgk_isvisz: 0.02,
+        };
+
+        function updateOran(key, val) {
+          const parsed = parseFloat(val);
+          if (!isNaN(parsed)) {
+            oranlar[key] = parsed;
+            recalcAll();
+          }
+        }
+
+        let personelData = [];
+        let projeler = [];
+        let detayMap = {};
+        let oranlarMap = {};
+
+        const n = (v) => parseFloat(v) || 0;
+
+        function formatPara(val) {
+          const num =
+            parseFloat(String(val).replace(/\./g, "").replace(",", ".")) || 0;
+          return num === 0
+            ? ""
+            : num.toLocaleString("tr-TR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              });
+        }
+
+        function unformatPara(val) {
+          return (
+            parseFloat(String(val).replace(/\./g, "").replace(",", ".")) || 0
+          );
+        }
+        const fmt = (v) =>
+          v === 0
+            ? "0,00"
+            : n(v).toLocaleString("tr-TR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              });
+
+        function calc(p) {
+          const argegun = n(p.argegun);
+          const digergun = n(p.digergun);
+          const toplamgun = n(p.toplamgun);
+          const bruttemel = n(p.bruttemel);
+          const fazlamesai = n(p.fazlamesai);
+          const aylikust = n(p.aylikust);
+          const argeorani = n(p.argeorani);
+          const agi = n(p.agi);
+          const gvorani = n(p.gvorani);
+
+          const r_isci = oranlar.sgk_isci;
+          const r_issizlik = oranlar.sgk_issizlik;
+          const r_isv = oranlar.sgk_isv;
+          const r_isvisz = oranlar.sgk_isvisz;
+
+          const gunlukust = aylikust / 30;
+          const argeaylikust = argegun * gunlukust;
+          const s5510aylik = digergun * gunlukust;
+          const toplambrut = bruttemel + fazlamesai;
+          const sgkmatrah =
+            toplamgun === 0
+              ? 0
+              : (bruttemel / toplamgun) * digergun + fazlamesai;
+
+          const sgkisci = sgkmatrah * r_isci;
+          const sgkissizlik = sgkmatrah * r_issizlik;
+          const sgkisv = sgkmatrah * r_isv;
+          const sgkisvisz = sgkmatrah * r_isvisz;
+          const sgkindirim = sgkmatrah * 0.05;
+
+          const argesigorta =
+            toplamgun === 0 ? 0 : (argegun / toplamgun) * bruttemel;
+          const sgkisvarge = argesigorta * r_isv;
+          const sgkisvisz2 = argesigorta * r_isvisz;
+          const argesgk5 = argesigorta * 0.05;
+          const sgk5746 = (argesigorta * 0.1675) / 2;
+
+          const argeucret =
+            toplamgun === 0 ? 0 : (argegun / toplamgun) * bruttemel;
+          const sgkisci2 = argeucret * r_isci;
+          const sgkissizlik2 = argeucret * r_issizlik;
+          const argegvmat = argeucret - sgkisci2 - sgkissizlik2;
+          const gvtutari = argegvmat * gvorani;
+          const agimahsup = gvtutari - agi;
+          const terkingv = agimahsup * argeorani;
+          const odenecekgv = agimahsup - terkingv;
+          const damgaterkin =
+            toplamgun > 0
+              ? Math.max(
+                  ((bruttemel * 0.00759 - 250.7) / toplamgun) * argegun,
+                  0,
+                )
+              : 0;
+
+          const argemaliyet =
+            bruttemel +
+            sgkisvarge +
+            sgkisvisz2 -
+            argesgk5 -
+            sgk5746 -
+            terkingv -
+            damgaterkin;
+
+          const toplamtesvik = sgk5746 + terkingv + damgaterkin;
+          return {
+            gunlukust,
+            argeaylikust,
+            s5510aylik,
+            toplambrut,
+            sgkmatrah,
+            sgkisci,
+            sgkissizlik,
+            sgkisv,
+            sgkisvisz,
+            sgkindirim,
+            argesigorta,
+            sgkisvarge,
+            sgkisvisz2,
+            argesgk5,
+            sgk5746,
+            argeucret,
+            sgkisci2,
+            sgkissizlik2,
+            argegvmat,
+            gvtutari,
+            agimahsup,
+            terkingv,
+            odenecekgv,
+            argemaliyet,
+            damgaterkin,
+            toplamtesvik,
+          };
+        }
+
+        function getDetay(proje_kodu, tckimlikno) {
+          if (!detayMap[proje_kodu]) detayMap[proje_kodu] = {};
+          if (!detayMap[proje_kodu][tckimlikno])
+            detayMap[proje_kodu][tckimlikno] = {};
+          return detayMap[proje_kodu][tckimlikno];
+        }
+
+        function updateDetay(proje_kodu, tckimlikno, field, val) {
+          const bordroFields = [
+            "argegun",
+            "digergun",
+            "toplamgun",
+            "bruttemel",
+            "fazlamesai",
+          ];
+          if (bordroFields.includes(field)) {
+            console.warn(`${field} bordro'dan gelir, burda güncellenemez`);
+            return;
+          }
+          getDetay(proje_kodu, tckimlikno)[field] = parseFloat(val) || 0;
+        }
+
+        function recalcRow(proje_kodu, tckimlikno) {
+          const row = document.querySelector(
+            `tr[data-key="${proje_kodu}_${tckimlikno}"]`,
+          );
+          if (!row) return;
+
+          const p = personelData.find((x) => x.tckimlikno === tckimlikno);
+          if (!p) return;
+
+          const projDetay = getDetay(proje_kodu, tckimlikno);
+
+          row
+            .querySelectorAll("input[data-field]:not([disabled])")
+            .forEach((el) => {
+              projDetay[el.dataset.field] = parseFloat(el.value) || 0;
+            });
+
+          const adamAyOrani = oranlarMap[tckimlikno]?.[proje_kodu] || 0;
           const d = {
             argegun: n(p.argegun),
             digergun: n(p.digergun),
             toplamgun: n(p.toplamgun),
-            bruttemel: n(p.bruttemel),
-            fazlamesai: n(p.fazlamesai),
+            bruttemel: n(p.bruttemel) * adamAyOrani,
+            fazlamesai: n(p.fazlamesai) * adamAyOrani,
             aylikust: n(projDetay.aylikust),
             argeorani: n(projDetay.argeorani),
             agi: n(projDetay.agi),
             gvorani: n(projDetay.gvorani),
           };
+
           const c = calc(d);
-
-          const tc = p.tckimlikno;
-
-          const adamAyOrani = oranlarMap[tc]?.[pk] || 0;
           c.damgaterkin = n(p.damgaterkin) * adamAyOrani;
           c.toplamtesvik = c.sgk5746 + c.terkingv + c.damgaterkin;
           c.argemaliyet =
@@ -478,14 +455,71 @@
             c.sgk5746 -
             c.terkingv -
             c.damgaterkin;
-          const key = `${pk}_${tc}`;
-          const inp = (field, val) =>
-            `<input type="number" step="any" data-field="${field}" value="${n(val)}"
-          onchange="updateDetay('${pk}','${tc}','${field}',this.value)"
-          oninput="recalcRow('${pk}','${tc}')" />`;
-          const inpDisabled = (val) =>
-            `<input type="number" step="any" value="${n(val)}" disabled />`;
-          return `
+
+          Object.keys(c).forEach((key) => {
+            const td = row.querySelector(`td[data-calc="${key}"]`);
+            if (td) td.textContent = fmt(c[key]);
+          });
+        }
+
+        function recalcAll() {
+          projeler.forEach((proje) => {
+            personelData.forEach((p) => {
+              recalcRow(proje.proje_kodu, p.tckimlikno);
+            });
+          });
+        }
+
+        function makeTableHTML(proje) {
+          const pk = proje.proje_kodu;
+          const rows = personelData
+            .map((p, idx) => {
+              const projDetay = getDetay(pk, p.tckimlikno);
+              const d = {
+                argegun: n(p.argegun),
+                digergun: n(p.digergun),
+                toplamgun: n(p.toplamgun),
+                bruttemel: n(p.bruttemel),
+                fazlamesai: n(p.fazlamesai),
+                aylikust: n(projDetay.aylikust),
+                argeorani: n(projDetay.argeorani),
+                agi: n(projDetay.agi),
+                gvorani: n(projDetay.gvorani),
+              };
+
+              const tc = p.tckimlikno;
+
+              const adamAyOrani = oranlarMap[tc]?.[pk] || 0;
+              d.bruttemel = n(p.bruttemel) * adamAyOrani;
+              d.fazlamesai = n(p.fazlamesai) * adamAyOrani;
+              const c = calc(d);
+              c.damgaterkin = n(p.damgaterkin) * adamAyOrani;
+              c.toplamtesvik = c.sgk5746 + c.terkingv + c.damgaterkin;
+              c.argemaliyet =
+                n(p.bruttemel) +
+                c.sgkisvarge +
+                c.sgkisvisz2 -
+                c.argesgk5 -
+                c.sgk5746 -
+                c.terkingv -
+                c.damgaterkin;
+              const key = `${pk}_${tc}`;
+              const inp = (field, val) => {
+                const paraAlanlari = ["aylikust", "agi"];
+                if (paraAlanlari.includes(field)) {
+                  return `<input type="text" data-field="${field}" value="${formatPara(val)}"
+      style="width:72px;padding:2px 4px;border:1px solid #ccc;border-radius:2px;font-size:11px;text-align:right;background:#fffde7;"
+      onfocus="this.value=unformatPara(this.value)||''"
+      onblur="this.value=formatPara(this.value); updateDetay('${pk}','${tc}','${field}',unformatPara(this.value)); recalcRow('${pk}','${tc}')"
+      />`;
+                }
+                return `<input type="number" step="any" data-field="${field}" value="${n(val)}"
+    onchange="updateDetay('${pk}','${tc}','${field}',this.value)"
+    oninput="recalcRow('${pk}','${tc}')" />`;
+              };
+              const inpDisabled = (val) =>
+                `<input type="number" step="any" value="${n(val)}" disabled />`;
+              return `
         <tr data-key="${key}" data-search="${(tc + " " + p.personeladisoyadi).toLowerCase()}">
           <td class="fixed">${idx + 1}</td>
           <td class="fixed left">${tc}</td>
@@ -494,8 +528,8 @@
           <td>${inpDisabled(p.argegun)}</td>
           <td>${inpDisabled(p.digergun)}</td>
           <td>${inpDisabled(p.toplamgun)}</td>
-          <td>${inpDisabled(p.bruttemel)}</td>
-          <td>${inpDisabled(p.fazlamesai)}</td>
+          <td>${inpDisabled(d.bruttemel)}</td>
+          <td>${inpDisabled(d.fazlamesai)}</td>
           <td class="input-yellow">${inp("aylikust", d.aylikust)}</td>
           <td class="calc-yellow" data-calc="gunlukust">${fmt(c.gunlukust)}</td>
           <td class="calc-yellow" data-calc="argeaylikust">${fmt(c.argeaylikust)}</td>
@@ -527,10 +561,10 @@
          <td class="calc" data-calc="toplamtesvik">${fmt(c.toplamtesvik)}</td>
          <td class="calc" data-calc="argemaliyet">${fmt(c.argemaliyet)}</td>
         </tr>`;
-        })
-        .join("");
+            })
+            .join("");
 
-      return `
+          return `
     <div class="proje-section overflow-auto" data-proje="${pk}">
       <div class="proje-baslik">${pk} — ${proje.proje_adi}</div>
       <table>
@@ -591,109 +625,115 @@
         <tbody>${rows}</tbody>
       </table>
     </div>`;
-    }
-
-    function renderAll() {
-      const container = document.getElementById("projeSections");
-      if (projeler.length === 0) {
-        container.innerHTML =
-          '<p style="color:#888;padding:20px;">Henüz proje eklenmemiş. <a onclick="loadPage(\'proje\')" href="#" target="_blank">Proje eklemek için tıklayın</a></p>';
-        return;
-      }
-      container.innerHTML = projeler.map(makeTableHTML).join("");
-    }
-
-    function filterRows() {
-      const q = document.getElementById("search").value.toLowerCase();
-      document.querySelectorAll("#projeSections tbody tr").forEach((tr) => {
-        tr.style.display =
-          tr.dataset.search && tr.dataset.search.includes(q) ? "" : "none";
-      });
-    }
-
-    async function saveAll() {
-      const btn = document.querySelector(".btn-save");
-      btn.textContent = "Kaydediliyor...";
-      btn.disabled = true;
-      let ok = 0,
-        fail = 0;
-
-      for (const [proje_kodu, personeller] of Object.entries(detayMap)) {
-        for (const [tckimlikno, d] of Object.entries(personeller)) {
-          try {
-            await fetch(
-              `/api/personel/detay/${encodeURIComponent(proje_kodu)}/${tckimlikno}`,
-              {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(d),
-              },
-            );
-            ok++;
-          } catch {
-            fail++;
-          }
         }
-      }
 
-      btn.textContent = "Tümünü Kaydet";
-      btn.disabled = false;
-      const st = document.getElementById("status");
-      st.textContent =
-        fail === 0
-          ? ` ${ok} kayıt kaydedildi`
-          : ` ${ok} başarılı, ${fail} hata`;
-      setTimeout(() => (st.textContent = ""), 3000);
-    }
+        function renderAll() {
+          const container = document.getElementById("projeSections");
+          if (projeler.length === 0) {
+            container.innerHTML =
+              '<p style="color:#888;padding:20px;">Henüz proje eklenmemiş. <a onclick="loadPage(\'proje\')" href="#" target="_blank">Proje eklemek için tıklayın</a></p>';
+            return;
+          }
+          container.innerHTML = projeler.map(makeTableHTML).join("");
+        }
 
-    function excelIndir() {
-      const params = new URLSearchParams({
-        sgk_isci: oranlar.sgk_isci,
-        sgk_issizlik: oranlar.sgk_issizlik,
-        sgk_isv: oranlar.sgk_isv,
-        sgk_isvisz: oranlar.sgk_isvisz,
-      });
-      window.location.href = `/api/personel/excel?${params}`;
-    }
-    (async () => {
-      const [pRes, prRes] = await Promise.all([
-        fetch("/api/personel").then((r) => r.json()),
-        fetch("/api/personel/projeler").then((r) => r.json()),
-      ]);
-      personelData = pRes;
-      projeler = prRes;
-      const oranRes = await fetch("/api/proje/oranlar").then((r) => r.json());
-      for (const o of oranRes) {
-        if (!oranlarMap[o.tckimlikno]) oranlarMap[o.tckimlikno] = {};
-        oranlarMap[o.tckimlikno][o.proje_kodu] = parseFloat(o.oran) || 0;
-      }
+        function filterRows() {
+          const q = document.getElementById("search").value.toLowerCase();
+          document.querySelectorAll("#projeSections tbody tr").forEach((tr) => {
+            tr.style.display =
+              tr.dataset.search && tr.dataset.search.includes(q) ? "" : "none";
+          });
+        }
 
-      await Promise.all(
-        projeler.map(async (proje) => {
-          const res = await fetch(
-            `/api/personel/detay/${encodeURIComponent(proje.proje_kodu)}`,
+        async function saveAll() {
+          const btn = document.querySelector(".btn-save");
+          btn.textContent = "Kaydediliyor...";
+          btn.disabled = true;
+          let ok = 0,
+            fail = 0;
+
+          for (const [proje_kodu, personeller] of Object.entries(detayMap)) {
+            for (const [tckimlikno, d] of Object.entries(personeller)) {
+              try {
+                await fetch(
+                  `/api/personel/detay/${encodeURIComponent(proje_kodu)}/${tckimlikno}`,
+                  {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(d),
+                  },
+                );
+                ok++;
+              } catch {
+                fail++;
+              }
+            }
+          }
+
+          btn.textContent = "Tümünü Kaydet";
+          btn.disabled = false;
+          const st = document.getElementById("status");
+          st.textContent =
+            fail === 0
+              ? ` ${ok} kayıt kaydedildi`
+              : ` ${ok} başarılı, ${fail} hata`;
+          setTimeout(() => (st.textContent = ""), 3000);
+        }
+
+        function excelIndir() {
+          const params = new URLSearchParams({
+            sgk_isci: oranlar.sgk_isci,
+            sgk_issizlik: oranlar.sgk_issizlik,
+            sgk_isv: oranlar.sgk_isv,
+            sgk_isvisz: oranlar.sgk_isvisz,
+          });
+          window.location.href = `/api/personel/excel?${params}`;
+        }
+        (async () => {
+          const [pRes, prRes] = await Promise.all([
+            fetch("/api/personel").then((r) => r.json()),
+            fetch("/api/personel/projeler").then((r) => r.json()),
+          ]);
+          personelData = pRes;
+          projeler = prRes;
+          const oranRes = await fetch("/api/proje/oranlar").then((r) =>
+            r.json(),
           );
-          const rows = await res.json();
-          detayMap[proje.proje_kodu] = {};
-          for (const r of rows) {
-            detayMap[proje.proje_kodu][r.tckimlikno] = r;
+          for (const o of oranRes) {
+            if (!oranlarMap[o.tckimlikno]) oranlarMap[o.tckimlikno] = {};
+            oranlarMap[o.tckimlikno][o.proje_kodu] = parseFloat(o.oran) || 0;
           }
-        }),
-      );
 
-      renderAll();
-      recalcAll();
+          await Promise.all(
+            projeler.map(async (proje) => {
+              const res = await fetch(
+                `/api/personel/detay/${encodeURIComponent(proje.proje_kodu)}`,
+              );
+              const rows = await res.json();
+              detayMap[proje.proje_kodu] = {};
+              for (const r of rows) {
+                detayMap[proje.proje_kodu][r.tckimlikno] = r;
+              }
+            }),
+          );
 
-      setInterval(async () => {
-        try {
-          const updated = await fetch("/api/personel").then((r) => r.json());
-          personelData = updated;
-
+          renderAll();
           recalcAll();
-        } catch (e) {
-          console.warn("Bordro verileri güncellenemedi:", e);
-        }
-      }, 15000);
-    })();
-  </script>
-</div>
+
+          setInterval(async () => {
+            try {
+              const updated = await fetch("/api/personel").then((r) =>
+                r.json(),
+              );
+              personelData = updated;
+
+              recalcAll();
+            } catch (e) {
+              console.warn("Bordro verileri güncellenemedi:", e);
+            }
+          }, 15000);
+        })();
+      </script>
+    </div>
+  </body>
+</html>

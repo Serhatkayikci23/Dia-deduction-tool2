@@ -484,7 +484,7 @@
         document.getElementById("msgBox").classList.remove("show");
 
         if (!email || !password) {
-          showMsg("⚠ Lütfen tüm alanları doldurun.", "error");
+          showMsg("Lütfen tüm alanları doldurun.", "error");
           return;
         }
 
@@ -499,7 +499,7 @@
           const data = await res.json();
 
           if (!res.ok) {
-            showMsg("⚠ " + (data.error || "Giriş başarısız."), "error");
+            showMsg(data.error || "Giriş başarısız.", "error");
             setLoading(false);
             return;
           }
@@ -508,12 +508,12 @@
           storage.setItem("arge_token", data.token);
           storage.setItem("arge_kullanici", JSON.stringify(data.kullanici));
 
-          showMsg("✓ Giriş başarılı...", "success");
+          showMsg("Giriş başarılı...", "success");
           setTimeout(() => {
             window.location.href = "/index.html";
           }, 700);
         } catch (err) {
-          showMsg("⚠ Sunucuya bağlanılamadı.", "error");
+          showMsg("Sunucuya bağlanılamadı.", "error");
           setLoading(false);
         }
       }

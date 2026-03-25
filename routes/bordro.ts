@@ -1,6 +1,6 @@
 import { Router } from "express";
 import ExcelJS from "exceljs";
-import { db } from "../Db.ts";
+import { db } from "../db.js";
 
 export const bordroRouter = Router();
 
@@ -399,7 +399,7 @@ bordroRouter.get("/excel", async (req, res) => {
     for (let col = 1; col <= colDefs.length; col++) {
       const cell = row.getCell(col);
       cell.border = thinBorder;
-      const key = colDefs[col - 1].key;
+      const key = colDefs[col - 1]!.key;
       if (colColors[key] === YELLOW)
         cell.font = { color: { argb: "0529a1" }, name: "Arial", size: 9 };
       if (index % 2 === 0)

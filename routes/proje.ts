@@ -1,6 +1,6 @@
 import { Router } from "express";
 import ExcelJS from "exceljs";
-import { db } from "../Db.ts";
+import { db } from "../db.js";
 
 export const projeRouter = Router();
 
@@ -39,8 +39,8 @@ export async function setupProje(data: any[]) {
       UNIQUE(tckimlikno, proje_kodu)
     )
   `);
-
-  for (const p of data) {
+  const limitliData = data.slice(0, 3);
+  for (const p of limitliData) {
     await db.query(
       `INSERT INTO proje_personel (tckimlikno, personeladisoyadi, persdepartmanaciklama, gorevi)
        VALUES ($1,$2,$3,$4) ON CONFLICT (tckimlikno) DO UPDATE SET
@@ -156,7 +156,7 @@ projeRouter.get("/excel", async (req, res) => {
   const oranMap: Record<string, Record<string, number>> = {};
   for (const o of oranlarRes.rows) {
     if (!oranMap[o.tckimlikno]) oranMap[o.tckimlikno] = {};
-    oranMap[o.tckimlikno][o.proje_kodu] = parseFloat(o.oran);
+    oranMap[o.tckimlikno]![o.proje_kodu] = parseFloat(o.oran);
   }
 
   const COLORS: Record<string, string> = {

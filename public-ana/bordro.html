@@ -395,6 +395,23 @@
       let personelData = [];
 
       const n = (v) => parseFloat(v) || 0;
+
+      function formatPara(val) {
+        const num =
+          parseFloat(String(val).replace(/\./g, "").replace(",", ".")) || 0;
+        return num === 0
+          ? ""
+          : num.toLocaleString("tr-TR", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+      }
+
+      function unformatPara(val) {
+        return (
+          parseFloat(String(val).replace(/\./g, "").replace(",", ".")) || 0
+        );
+      }
       const fmt = (v) =>
         v === 0
           ? "0,00"
@@ -509,7 +526,7 @@
         const p = personelData.find((x) => x.tckimlikno === tc);
         if (!p) return;
         row.querySelectorAll("input[data-field]").forEach((el) => {
-          p[el.dataset.field] = parseFloat(el.value) || 0;
+          p[el.dataset.field] = unformatPara(el.value);
         });
         const c = calc(p);
         Object.keys(c).forEach((key) => {
@@ -529,11 +546,19 @@
         personelData.forEach((p, idx) => {
           const c = calc(p);
           const tc = p.tckimlikno;
-          const inp = (field, val) =>
-            `<input type="number" step="any" data-field="${field}" value="${n(val)}"
-          onchange="update('${tc}','${field}',this.value)"
-          oninput="recalcRow('${tc}')" />`;
-
+          const inp = (field, val) => {
+            const paraAlanlari = ["bruttemel", "fazlamesai", "aylikust", "agi"];
+            if (paraAlanlari.includes(field)) {
+              return `<input type="text" data-field="${field}" value="${formatPara(val)}"
+      style="width:72px;padding:2px 4px;border:1px solid #ccc;border-radius:2px;font-size:11px;text-align:right;background:#fffde7;"
+      onfocus="this.value=unformatPara(this.value)||''"
+      onblur="this.value=formatPara(this.value); update('${tc}','${field}',unformatPara(this.value)); recalcRow('${tc}')"
+      />`;
+            }
+            return `<input type="number" step="any" data-field="${field}" value="${n(val)}"
+    onchange="update('${tc}','${field}',this.value)"
+    oninput="recalcRow('${tc}')" />`;
+          };
           const tr = document.createElement("tr");
           tr.dataset.tc = tc;
           tr.dataset.search = (tc + " " + p.personeladisoyadi).toLowerCase();

@@ -691,12 +691,12 @@
         }
         (async () => {
           const [pRes, prRes] = await Promise.all([
-            fetch("/api/personel").then((r) => r.json()),
-            fetch("/api/personel/projeler").then((r) => r.json()),
+            authFetch("/api/personel").then((r) => r.json()),
+            authFetch("/api/personel/projeler").then((r) => r.json()),
           ]);
           personelData = pRes;
           projeler = prRes;
-          const oranRes = await fetch("/api/proje/oranlar").then((r) =>
+          const oranRes = await authFetch("/api/proje/oranlar").then((r) =>
             r.json(),
           );
           for (const o of oranRes) {
@@ -706,7 +706,7 @@
 
           await Promise.all(
             projeler.map(async (proje) => {
-              const res = await fetch(
+              const res = await authFetch(
                 `/api/personel/detay/${encodeURIComponent(proje.proje_kodu)}`,
               );
               const rows = await res.json();

@@ -6,7 +6,7 @@ import { db, baseUrl, firmCode, periodCode, setSessionId } from "./db.js";
 import { personelRouter, setupPersonel } from "./routes/personel.js";
 import { projeRouter, setupProje } from "./routes/proje.js";
 import { bordroRouter, setupBordro } from "./routes/bordro.js";
-import { authRouter } from "./routes/auth.js";
+import { authRouter, authMiddleware } from "./routes/auth.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,10 +17,10 @@ app.use("/image", express.static("image"));
 
 app.use(express.static(path.join(__dirname, "public-ana")));
 
-app.use("/api/personel", personelRouter);
-app.use("/api/proje", projeRouter);
-app.use("/api/bordro", bordroRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/personel", authMiddleware, personelRouter);
+app.use("/api/proje", authMiddleware, projeRouter);
+app.use("/api/bordro", authMiddleware, bordroRouter);
 
 async function login() {
   const response = await fetch(baseUrl + "/sis/json", {
@@ -86,6 +86,7 @@ async function main() {
   console.log("Bordro setup OK");
 
   console.log(`${limitliData.length} personel aktarıldı`);
+
   app.listen(5000, () => console.log("Sunucu: http://localhost:5000"));
 }
 

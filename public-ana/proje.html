@@ -318,9 +318,9 @@
 
       async function loadAll() {
         const [pRes, prRes, orRes] = await Promise.all([
-          fetch("/api/personel").then((r) => r.json()),
-          fetch("/api/proje/projeler").then((r) => r.json()),
-          fetch("/api/proje/oranlar").then((r) => r.json()),
+          authFetch("/api/personel").then((r) => r.json()),
+          authFetch("/api/proje/projeler").then((r) => r.json()),
+          authFetch("/api/proje/oranlar").then((r) => r.json()),
         ]);
         personelData = pRes;
         projeler = prRes;
@@ -453,7 +453,7 @@
         for (const [tc, oranlar] of Object.entries(oranMap)) {
           for (const [proje_kodu, oran] of Object.entries(oranlar)) {
             try {
-              await fetch("/api/proje/oranlar", {
+              await authFetch("/api/proje/oranlar", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ tckimlikno: tc, proje_kodu, oran }),
@@ -523,7 +523,7 @@
           : "/api/proje/projeler";
         const method = editProjeId ? "PUT" : "POST";
 
-        await fetch(url, {
+        await authFetch(url, {
           method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
@@ -542,7 +542,7 @@
           )
         )
           return;
-        await fetch(`/api/proje/projeler/${id}`, { method: "DELETE" });
+        await authFetch(`/api/proje/projeler/${id}`, { method: "DELETE" });
         await loadAll();
         setStatus("✓ Proje silindi");
       }

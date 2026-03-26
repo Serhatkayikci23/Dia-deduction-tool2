@@ -257,6 +257,31 @@
     </div>
 
     <script>
+      const token =
+        localStorage.getItem("arge_token") ||
+        sessionStorage.getItem("arge_token");
+      if (!token) window.location.href = "/login.html";
+
+      function authFetch(url, options) {
+        options = options || {};
+        const token =
+          localStorage.getItem("arge_token") ||
+          sessionStorage.getItem("arge_token");
+        const headers = Object.assign({}, options.headers || {}, {
+          Authorization: "Bearer " + token,
+        });
+        return fetch(
+          url,
+          Object.assign({}, options, { headers: headers }),
+        ).then(function (res) {
+          if (res.status === 401) {
+            localStorage.removeItem("arge_token");
+            sessionStorage.removeItem("arge_token");
+            window.location.href = "/login.html";
+          }
+          return res;
+        });
+      }
       let currentPage = null;
 
       async function loadPage(page) {

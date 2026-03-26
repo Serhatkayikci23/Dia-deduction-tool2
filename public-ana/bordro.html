@@ -666,7 +666,7 @@
       }
 
       (async () => {
-        const res = await fetch("/api/bordro/personel");
+        const res = await authFetch("/api/bordro/personel");
         personelData = await res.json();
         renderRows();
       })();
